@@ -2,6 +2,7 @@ package com.faustas.dbms.framework.connections;
 
 import com.faustas.dbms.framework.ApplicationContext;
 import com.faustas.dbms.framework.annotations.Service;
+import com.faustas.dbms.framework.interfaces.Shutdownable;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class PostgresConnectionPool implements ConnectionPool {
+public class DatabaseConnectionPoolImpl implements DatabaseConnectionPool, Shutdownable {
     private static final int INITIAL_POOL_SIZE = 5;
     private static final int MAX_POOL_SIZE = 10;
 
@@ -24,7 +25,7 @@ public class PostgresConnectionPool implements ConnectionPool {
 
     private final List<Connection> usedConnections = new ArrayList<>(INITIAL_POOL_SIZE);
 
-    public PostgresConnectionPool(ApplicationContext context) throws SQLException {
+    public DatabaseConnectionPoolImpl(ApplicationContext context) throws SQLException {
         this.url = context.getProperty("database.url");
         this.user = context.getProperty("database.user");
         this.password = context.getProperty("database.password");

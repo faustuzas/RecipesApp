@@ -3,7 +3,7 @@ package com.faustas.dbms.framework.connections;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public interface ConnectionPool {
+public interface DatabaseConnectionPool {
 
     Connection getConnection() throws SQLException;
 

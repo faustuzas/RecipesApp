@@ -1,6 +1,6 @@
 package com.faustas.dbms.framework.repositories;
 
-import com.faustas.dbms.framework.connections.ConnectionPool;
+import com.faustas.dbms.framework.connections.DatabaseConnectionPool;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -9,9 +9,9 @@ import java.util.Arrays;
 
 public abstract class QueryExecutor {
 
-    protected final ConnectionPool connectionPool;
+    protected final DatabaseConnectionPool connectionPool;
 
-    public QueryExecutor(ConnectionPool connectionPool) {
+    public QueryExecutor(DatabaseConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
 

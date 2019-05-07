@@ -24,9 +24,13 @@ public class ApplicationContext {
 
     public ApplicationContext(Class application, String pathToProperties) {
         try {
-            Class.forName("org.postgresql.Driver");
             loadProperties(pathToProperties);
             scanForServiceClasses(application.getPackage());
+
+            String databaseDriver = getProperty("database.driver", null);
+            if (databaseDriver != null) {
+                Class.forName(databaseDriver);
+            }
 
             Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
         } catch (ClassNotFoundException | IOException e) {
@@ -47,11 +51,8 @@ public class ApplicationContext {
         }
 
         Class requiredClass = scannedClasses.stream()
-                .filter(classType::isAssignableFrom).findFirst().orElse(null);
-
-        if (requiredClass == null) {
-            throw new IllegalArgumentException("No implementation for this class found");
-        }
+                .filter(classType::isAssignableFrom).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No implementation for this class found"));
 
         Constructor<?>[] constructors = requiredClass.getConstructors();
         if (constructors.length != 1) {
@@ -161,9 +162,12 @@ public class ApplicationContext {
 
     private void shutdown() {
         for (Object service : createdServices) {
-            if (service.getClass().isAssignableFrom(Shutdownable.class)) {
-                System.out.println("Shutdown for " + service.getClass().getName());
-                ((Shutdownable) service).shutdownable();
+            if (service instanceof Shutdownable) {
+                try {
+                    ((Shutdownable) service).shutdown();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

@@ -1,7 +1,7 @@
 package com.faustas.dbms.framework.repositories;
 
 import com.faustas.dbms.framework.annotations.*;
-import com.faustas.dbms.framework.connections.ConnectionPool;
+import com.faustas.dbms.framework.connections.DatabaseConnectionPool;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -10,9 +10,10 @@ import java.util.*;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+@Service
 public class SelectQueryExecutor extends QueryExecutor {
 
-    public SelectQueryExecutor(ConnectionPool connectionPool) {
+    public SelectQueryExecutor(DatabaseConnectionPool connectionPool) {
         super(connectionPool);
     }
 

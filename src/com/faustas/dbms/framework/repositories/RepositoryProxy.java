@@ -2,7 +2,6 @@ package com.faustas.dbms.framework.repositories;
 
 import com.faustas.dbms.framework.annotations.Select;
 import com.faustas.dbms.framework.annotations.Service;
-import com.faustas.dbms.framework.connections.ConnectionPool;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
@@ -14,8 +13,8 @@ public class RepositoryProxy implements InvocationHandler {
 
     private QueryExecutor selectExecutor;
 
-    public RepositoryProxy(ConnectionPool connectionPool) {
-        this.selectExecutor = new SelectQueryExecutor(connectionPool);
+    public RepositoryProxy(SelectQueryExecutor selectExecutor) {
+        this.selectExecutor = selectExecutor;
     }
 
     @Override

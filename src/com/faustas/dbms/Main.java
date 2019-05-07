@@ -7,7 +7,7 @@ import com.faustas.dbms.repositories.IngredientsRepository;
 public class Main {
 
     public static void main(String[] args) {
-        ApplicationContext context = new ApplicationContext(Main.class,"resources/application.properties");
+        ApplicationContext context = new ApplicationContext(Main.class, "resources/application.properties");
         IngredientsRepository ingredientsRepository = context.getBean(IngredientsRepository.class);
 
         for (Ingredient ingredient : ingredientsRepository.findAll()) {

@@ -2,5 +2,5 @@ package com.faustas.dbms.framework.interfaces;
 
 public interface Shutdownable {
 
-    void shutdownable();
+    void shutdown() throws Exception;
 }
