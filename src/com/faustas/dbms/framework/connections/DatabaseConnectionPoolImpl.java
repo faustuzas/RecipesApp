@@ -40,7 +40,7 @@ public class DatabaseConnectionPoolImpl implements DatabaseConnectionPool, Shutd
     }
 
     @Override
-    public Connection getConnection() throws SQLException {
+    public synchronized Connection getConnection() throws SQLException {
         if (connectionPool.isEmpty()) {
             if (usedConnections.size() < MAX_POOL_SIZE) {
                 connectionPool.add(createConnection());
@@ -57,13 +57,13 @@ public class DatabaseConnectionPoolImpl implements DatabaseConnectionPool, Shutd
     }
 
     @Override
-    public boolean releaseConnection(Connection connection) {
+    public synchronized boolean releaseConnection(Connection connection) {
         connectionPool.add(connection);
         return usedConnections.remove(connection);
     }
 
     @Override
-    public void shutdown() throws SQLException {
+    public synchronized void shutdown() throws SQLException {
         usedConnections.forEach(this::releaseConnection);
         for (Connection c : connectionPool) {
             c.close();

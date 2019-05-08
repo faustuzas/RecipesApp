@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 public class QueryProcessor {
     private static final String SINGLE_VALUE = "#";
@@ -19,6 +20,7 @@ public class QueryProcessor {
 
         // collect param position and assign exec
         Matcher paramMatcher = PARAM_PATTERN.matcher(unprepared);
+        String preparedQuery = unprepared;
 
         int paramPosition = 1; // in sql exec position starts at 1
         while (paramMatcher.find()) {
@@ -27,9 +29,9 @@ public class QueryProcessor {
             String paramType = group.substring(0, 1);
             String paramName = group.substring(1);
 
-            Object argForSql;
             if (paramType.equals(SINGLE_VALUE)) {
-                argForSql = extractValue(paramName, namedArgs);
+                positionalParameters.put(paramPosition++, extractValue(paramName, namedArgs));
+                preparedQuery = PARAM_PATTERN.matcher(preparedQuery).replaceFirst("?");
             } else if (paramType.equals(LIST_VALUE)) {
                 Object iterableObject = extractValue(paramName, namedArgs);
                 if (! (iterableObject instanceof Collection || iterableObject.getClass().isArray())) {
@@ -43,15 +45,17 @@ public class QueryProcessor {
                     iterable = (Object[]) iterableObject;
                 }
 
-                argForSql = join(iterable);
+                for (Object it : iterable) {
+                    positionalParameters.put(paramPosition++, it);
+                }
+
+                String questionMarks = join(IntStream.range(0, iterable.length).mapToObj(i -> "?").toArray());
+                preparedQuery = PARAM_PATTERN.matcher(preparedQuery).replaceFirst(questionMarks);
             } else {
                 throw new RuntimeException("Argument in SQL exec can start with # for single or @ for lists");
             }
-
-            positionalParameters.put(paramPosition++, argForSql);
         }
 
-        String preparedQuery = paramMatcher.replaceAll("?");
         return new ProcessedQuery(preparedQuery, positionalParameters);
     }
 
