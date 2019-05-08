@@ -12,6 +12,13 @@ public class Main {
 
         for (Ingredient ingredient : ingredientsRepository.findAll()) {
             System.out.println(ingredient);
+            ingredient.setAmount(ingredient.getAmount() + " labas");
+            ingredientsRepository.update(ingredient);
+        }
+
+        System.out.println("*****************************************");
+        for (Ingredient ingredient : ingredientsRepository.findAll()) {
+            System.out.println(ingredient);
         }
     }
 }

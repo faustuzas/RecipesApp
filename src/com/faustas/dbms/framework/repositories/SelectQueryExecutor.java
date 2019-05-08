@@ -8,7 +8,6 @@ import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
-import java.util.stream.Collectors;
 
 @Service
 public class SelectQueryExecutor extends QueryExecutor {
@@ -20,18 +19,8 @@ public class SelectQueryExecutor extends QueryExecutor {
     @Override
     public Object execute(Method method, Object[] args) throws SQLException, ReflectiveOperationException {
         Select selectAnnotation = method.getAnnotation(Select.class);
-        List<Param> params = Arrays.stream(method.getParameters()).filter(p -> p.isAnnotationPresent(Param.class))
-                .map(p -> p.getAnnotation(Param.class)).collect(Collectors.toList());
 
-        if (args == null) {
-            args = new Object[0];
-        }
-
-        if (params.size() != args.length) {
-            throw new RuntimeException("All arguments passed to repository method must have annotation @Param");
-        }
-
-        ResultSet resultSet = executeQuery(selectAnnotation.value(), getNamedArgs(params, args));
+        ResultSet resultSet = (ResultSet) executeQuery(selectAnnotation.value(), constructNamedArgs(method, args));
 
         Class<?> returnClass = method.getDeclaringClass().getAnnotation(Repository.class).value();
         List<Object> createdObjects = new ArrayList<>();
@@ -79,41 +68,16 @@ public class SelectQueryExecutor extends QueryExecutor {
         return createdObjects.size() == 0 ? null : createdObjects.get(0);
     }
 
+    @Override
+    Object executeStatement(PreparedStatement statement) throws SQLException {
+        return statement.executeQuery();
+    }
+
     private Method extractMethodFromExec(Exec exec) {
         return Arrays.stream(exec.aClass().getMethods())
                 .filter(m -> m.getName().equals(exec.method()))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Provided method does not exist"));
-    }
-
-    private ResultSet executeQuery(String query, Map<String, Object> namedArgs) throws SQLException {
-        QueryProcessor queryProcessor = new QueryProcessor();
-        ProcessedQuery processedQuery = queryProcessor.process(query, namedArgs);
-
-        Connection connection = connectionPool.getConnection();
-        PreparedStatement statement = connection.prepareStatement(processedQuery.getPreparedQuery());
-        prepareStatement(statement, processedQuery.getPositionalParams());
-        ResultSet resultSet = statement.executeQuery();
-        connectionPool.releaseConnection(connection);
-
-        return resultSet;
-    }
-
-    private void prepareStatement(PreparedStatement statement, Map<Integer, Object> positionalParams)
-        throws SQLException {
-        for (Integer paramPosition : positionalParams.keySet()) {
-            Object param = positionalParams.get(paramPosition);
-
-            if (param instanceof Integer) {
-                statement.setInt(paramPosition, (Integer) param);
-            } else if (param instanceof String) {
-                statement.setString(paramPosition, (String) param);
-            } else if (param instanceof Double) {
-                statement.setDouble(paramPosition, (Double) param);
-            } else if (param instanceof Date) {
-                statement.setDate(paramPosition, new java.sql.Date(((Date) param).getTime()));
-            }
-        }
     }
 
     private void assignValue(Object object, ResultSet resultSet, Method setter, String columnName)
@@ -150,17 +114,5 @@ public class SelectQueryExecutor extends QueryExecutor {
 
         return Arrays.stream(results.value()).filter(r -> r.column().equals(columnName))
                 .findFirst().orElse(null);
-    }
-
-    private Map<String, Object> getNamedArgs(List<Param> params, Object[] args) {
-        List<String> paramNames = params.stream().map(Param::value)
-                .collect(Collectors.toList());
-
-        HashMap<String, Object> namedArgs = new HashMap<>();
-        for (int i = 0; i < paramNames.size(); ++i) {
-            namedArgs.put(paramNames.get(i), args[i]);
-        }
-
-        return namedArgs;
     }
 }

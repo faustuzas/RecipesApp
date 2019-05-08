@@ -19,4 +19,9 @@ public interface IngredientsRepository {
             @Result(column = "product_id", property = "product", exec = @Exec(aClass = ProductRepository.class))
     })
     List<Ingredient> findAll();
+
+    @Update("UPDATE ingredients " +
+            "SET amount = #i.amount, product_id = #i.product.id " +
+            "WHERE id = #i.id")
+    Integer update(@Param("i") Ingredient ingredient);
 }

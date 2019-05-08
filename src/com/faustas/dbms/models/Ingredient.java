@@ -8,8 +8,6 @@ public class Ingredient {
 
     private Product product;
 
-    private Recipe recipe;
-
     public Integer getId() {
         return id;
     }
@@ -34,21 +32,12 @@ public class Ingredient {
         this.product = product;
     }
 
-    public Recipe getRecipe() {
-        return recipe;
-    }
-
-    public void setRecipe(Recipe recipe) {
-        this.recipe = recipe;
-    }
-
     @Override
     public String toString() {
         return "Ingredient{" +
                 "id=" + id +
                 ", amount='" + amount + '\'' +
                 ", product=" + product +
-                ", recipe=" + recipe +
                 '}';
     }
 }
