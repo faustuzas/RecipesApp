@@ -21,14 +21,14 @@ public interface IngredientsRepository {
     })
     Ingredient findById(@Param("id") Integer id);
 
+    @Insert("INSERT INTO ingredients (amount, product_id, recipe_id) " +
+            "VALUES (#i.amount, #i.product.id, #r.id)")
+    void insert(@Param("i") Ingredient ingredient, @Param("r") Recipe recipe);
+
     @Update("UPDATE ingredients " +
             "SET amount = #i.amount, product_id = #i.product.id " +
             "WHERE id = #i.id")
     Integer update(@Param("i") Ingredient ingredient);
-
-    @Insert("INSERT INTO ingredients (amount, product_id, recipe_id) " +
-            "VALUES (#i.amount, #i.product.id, #r.id)")
-    void insert(@Param("i") Ingredient ingredient, @Param("r") Recipe recipe);
 
     @Delete("DELETE FROM ingredients WHERE id = #i.id")
     void delete(@Param("i") Ingredient ingredient);
