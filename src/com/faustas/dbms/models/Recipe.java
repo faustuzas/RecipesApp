@@ -12,8 +12,6 @@ public class Recipe {
 
     private Integer minutesToPrepare;
 
-    private User author;
-
     private Date createdAt;
 
     private Date updatedAt;
@@ -50,14 +48,6 @@ public class Recipe {
         this.minutesToPrepare = minutesToPrepare;
     }
 
-    public User getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(User author) {
-        this.author = author;
-    }
-
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -81,7 +71,6 @@ public class Recipe {
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", minutesToPrepare=" + minutesToPrepare +
-                ", author=" + author +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

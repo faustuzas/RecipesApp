@@ -9,6 +9,6 @@ public class Main {
         ApplicationContext context = new ApplicationContext(Main.class, "resources/application.properties");
         IngredientsRepository ingredientsRepository = context.getBean(IngredientsRepository.class);
 
-        ingredientsRepository.delete(new Integer[]{43, 44});
+
     }
 }

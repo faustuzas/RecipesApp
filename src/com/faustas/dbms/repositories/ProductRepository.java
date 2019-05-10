@@ -20,7 +20,7 @@ public interface ProductRepository {
     })
     Product findById(@Param("id") Integer id);
 
-    @Select("SELECT * FROM products WHERE name LIKE %#name%")
+    @Select("SELECT * FROM products WHERE name ILIKE '%#name%'")
     @Results({
             @Result(column = "fat", property = "fats")
     })
