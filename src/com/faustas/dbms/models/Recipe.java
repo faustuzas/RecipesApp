@@ -1,6 +1,7 @@
 package com.faustas.dbms.models;
 
 import java.util.Date;
+import java.util.List;
 
 public class Recipe {
 
@@ -11,6 +12,8 @@ public class Recipe {
     private String description;
 
     private Integer minutesToPrepare;
+
+    private List<Ingredient> ingredients;
 
     private Date createdAt;
 
@@ -48,6 +51,14 @@ public class Recipe {
         this.minutesToPrepare = minutesToPrepare;
     }
 
+    public List<Ingredient> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(List<Ingredient> ingredients) {
+        this.ingredients = ingredients;
+    }
+
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -71,6 +82,7 @@ public class Recipe {
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", minutesToPrepare=" + minutesToPrepare +
+                ", ingredients=" + ingredients +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

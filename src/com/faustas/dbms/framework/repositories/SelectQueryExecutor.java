@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Service
 public class SelectQueryExecutor extends QueryExecutor {
@@ -36,15 +37,16 @@ public class SelectQueryExecutor extends QueryExecutor {
                 String columnName = setMeta.getColumnName(column);
                 String objectProperty = columnName;
 
-                Result singleResultMeta = findResultMeta(columnName, resultsMeta);
-                if (singleResultMeta != null && !singleResultMeta.property().isEmpty()) {
-                    objectProperty = singleResultMeta.property();
+                // TODO:: fix
+                List<Result> columnMetas = findColumnMetas(columnName, resultsMeta);
+                if (columnMetas != null && !columnMetas.property().isEmpty()) {
+                    objectProperty = columnMetas.property();
                 }
 
                 Method setter = findSetter(returnObject, objectProperty);
                 if (setter != null) {
-                    if (singleResultMeta != null && !singleResultMeta.exec().aClass().equals(void.class)) {
-                        Exec exec = singleResultMeta.exec();
+                    if (columnMetas != null && !columnMetas.exec().aClass().equals(void.class)) {
+                        Exec exec = columnMetas.exec();
                         Method externalMethod = extractMethodFromExec(exec);
                         if (externalMethod.getParameterTypes().length != 1) {
                             throw new RuntimeException("Remote methods should have only one parameter");
@@ -107,12 +109,12 @@ public class SelectQueryExecutor extends QueryExecutor {
         throw new RuntimeException("Type recognition not implemented: " + parameterType.getTypeName());
     }
 
-    private Result findResultMeta(String columnName, Results results) {
+    private List<Result> findColumnMetas(String columnName, Results results) {
         if (results == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         return Arrays.stream(results.value()).filter(r -> r.column().equals(columnName))
-                .findFirst().orElse(null);
+            .collect(Collectors.toList());
     }
 }

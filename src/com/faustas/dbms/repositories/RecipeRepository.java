@@ -11,15 +11,17 @@ public interface RecipeRepository {
 
     @Select("SELECT * FROM recipes")
     @Results({
-            @Result()
+            @Result(column = "minutes_to_prepare", property = "minutesToPrepare"),
+            @Result(column = "created_at", property = "createdAt"),
+            @Result(column = "updated_at", property = "updatedAt")
     })
     List<Recipe> findAll();
 
     @Select("SELECT * FROM recipes WHERE id = #id")
     Recipe findById(@Param("id") Integer id);
 
-    @Select("SELECT * FROM products WHERE name ILIKE '%#name%'")
-    List<Product> searchByName(@Param("name") String name);
+    @Select("SELECT * FROM recipes WHERE title ILIKE '%#title%'")
+    List<Recipe> searchByName(@Param("title") String title);
 
     @Insert("INSERT INTO products (name, carbohydrates, proteins, fat) " +
             "VALUES (#p.name, #p.carbohydrates, #p.proteins, #p.fats)")
