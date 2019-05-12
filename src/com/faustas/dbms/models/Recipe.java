@@ -15,6 +15,8 @@ public class Recipe {
 
     private List<Ingredient> ingredients;
 
+    private List<Review> reviews;
+
     private Date createdAt;
 
     private Date updatedAt;
@@ -59,6 +61,14 @@ public class Recipe {
         this.ingredients = ingredients;
     }
 
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -83,6 +93,7 @@ public class Recipe {
                 ", description='" + description + '\'' +
                 ", minutesToPrepare=" + minutesToPrepare +
                 ", ingredients=" + ingredients +
+                ", reviews=" + reviews +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

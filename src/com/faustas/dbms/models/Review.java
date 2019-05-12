@@ -8,11 +8,7 @@ public class Review {
 
     private String comment;
 
-    private int stars;
-
-    private User user;
-
-    private Recipe recipe;
+    private Integer stars;
 
     private Date createdAt;
 
@@ -32,28 +28,12 @@ public class Review {
         this.comment = comment;
     }
 
-    public int getStars() {
+    public Integer getStars() {
         return stars;
     }
 
-    public void setStars(int stars) {
+    public void setStars(Integer stars) {
         this.stars = stars;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Recipe getRecipe() {
-        return recipe;
-    }
-
-    public void setRecipe(Recipe recipe) {
-        this.recipe = recipe;
     }
 
     public Date getCreatedAt() {
@@ -70,8 +50,6 @@ public class Review {
                 "id=" + id +
                 ", comment='" + comment + '\'' +
                 ", stars=" + stars +
-                ", user=" + user +
-                ", recipe=" + recipe +
                 ", createdAt=" + createdAt +
                 '}';
     }
