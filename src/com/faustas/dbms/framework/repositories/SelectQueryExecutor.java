@@ -33,29 +33,50 @@ public class SelectQueryExecutor extends QueryExecutor {
         while (resultSet.next()) {
             Object returnObject = returnClass.newInstance();
 
-            for (int column = 1; column <= columnCount; ++column) {
-                String columnName = setMeta.getColumnName(column);
-                String objectProperty = columnName;
-
-                // TODO:: fix
+            // sql column indexing starts from 1
+            for (int columnIndex = 1; columnIndex <= columnCount; ++columnIndex) {
+                String columnName = setMeta.getColumnName(columnIndex);
                 List<Result> columnMetas = findColumnMetas(columnName, resultsMeta);
-                if (columnMetas != null && !columnMetas.property().isEmpty()) {
-                    objectProperty = columnMetas.property();
+
+                if (columnMetas.size() == 0) {
+                    Method setter = findSetter(returnObject, columnName);
+                    /*
+                     * Object could not have setter for some relational field
+                     * E.g. recipe table can have user_id, but recipe does not have property user
+                     */
+                    if (setter != null) {
+                        assignValue(returnObject, resultSet, setter, columnName);
+                        continue;
+                    }
                 }
 
-                Method setter = findSetter(returnObject, objectProperty);
-                if (setter != null) {
-                    if (columnMetas != null && !columnMetas.exec().aClass().equals(void.class)) {
-                        Exec exec = columnMetas.exec();
-                        Method externalMethod = extractMethodFromExec(exec);
-                        if (externalMethod.getParameterTypes().length != 1) {
-                            throw new RuntimeException("Remote methods should have only one parameter");
-                        }
+                for (Result columnMeta : columnMetas) {
+                    String objectProperty = columnName;
+                    if (!columnMeta.property().isEmpty()) {
+                        objectProperty = columnMeta.property();
+                    }
 
-                        Object arg = chooseCorrectExtraction(externalMethod.getParameterTypes()[0], columnName, resultSet);
-                        setter.invoke(returnObject, execute(externalMethod, new Object[] { arg }));
-                    } else {
-                        assignValue(returnObject, resultSet, setter, columnName);
+                    Method setter = findSetter(returnObject, objectProperty);
+                    if (setter != null) {
+                        if (!columnMeta.exec().aClass().equals(void.class)) {
+                            Exec exec = columnMeta.exec();
+                            Method externalMethod = extractMethodFromExec(exec);
+                            if (externalMethod.getParameterTypes().length != 1) {
+                                throw new RuntimeException("Remote methods should have only one parameter");
+                            }
+
+                            Object arg = chooseCorrectExtraction(externalMethod.getParameterTypes()[0], columnName, resultSet);
+                            /*
+                             * Execute recursively this method if there is indicated method from another
+                             * class to get all object relational tree
+                             */
+                            setter.invoke(returnObject, execute(externalMethod, new Object[] { arg }));
+                        } else {
+                            /*
+                             * Just assign value from column with different name than property
+                             */
+                            assignValue(returnObject, resultSet, setter, columnName);
+                        }
                     }
                 }
             }
@@ -63,6 +84,10 @@ public class SelectQueryExecutor extends QueryExecutor {
             createdObjects.add(returnObject);
         }
 
+        /*
+         * If invoked repository method returns some kind of collection
+         * then return collection otherwise return single element
+         */
         if (Collection.class.isAssignableFrom(method.getReturnType())) {
             return createdObjects;
         }

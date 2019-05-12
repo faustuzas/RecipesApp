@@ -50,10 +50,24 @@ public abstract class QueryExecutor {
         return getNamedArgs(params, args);
     }
 
-    Method findSetter(Object object, String property) {
+    /**
+     * Iterate through all methods in object
+     * and search for required setter.
+     *
+     * Search is done by taking each method and
+     * cutting its first three letters ("set" to be exact)
+     * and comparing if the leftover from the setter name,
+     * which is some property name,
+     * matches the one which is requested
+     */
+    Method findSetter(Object object, String propertyToSet) {
         return Arrays.stream(object.getClass().getMethods())
                 .filter(m -> m.getName().startsWith("set"))
-                .filter(m -> m.getName().substring(3).toLowerCase().equals(property))
+                .filter(m -> {
+                    String property = m.getName().substring(3);
+                    property = property.substring(0, 1).toLowerCase() + property.substring(1);
+                    return property.equals(propertyToSet);
+                })
                 .findFirst().orElse(null);
     }
 
