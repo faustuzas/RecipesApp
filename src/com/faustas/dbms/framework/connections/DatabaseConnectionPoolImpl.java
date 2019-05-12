@@ -1,7 +1,7 @@
 package com.faustas.dbms.framework.connections;
 
-import com.faustas.dbms.framework.ApplicationContext;
 import com.faustas.dbms.framework.annotations.Service;
+import com.faustas.dbms.framework.annotations.Value;
 import com.faustas.dbms.framework.interfaces.Shutdownable;
 
 import java.sql.Connection;
@@ -25,10 +25,11 @@ public class DatabaseConnectionPoolImpl implements DatabaseConnectionPool, Shutd
 
     private final List<Connection> usedConnections = new ArrayList<>(INITIAL_POOL_SIZE);
 
-    public DatabaseConnectionPoolImpl(ApplicationContext context) throws SQLException {
-        this.url = context.getProperty("database.url");
-        this.user = context.getProperty("database.user");
-        this.password = context.getProperty("database.password");
+    public DatabaseConnectionPoolImpl(@Value("database.url") String url, @Value("database.user") String user,
+                                      @Value("database.password") String password) throws SQLException {
+        this.url = url;
+        this.user = user;
+        this.password = password;
 
         for (int i = 0; i < INITIAL_POOL_SIZE; ++i) {
             connectionPool.add(createConnection());

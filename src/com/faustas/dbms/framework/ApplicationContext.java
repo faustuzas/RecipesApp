@@ -2,12 +2,14 @@ package com.faustas.dbms.framework;
 
 import com.faustas.dbms.framework.annotations.Repository;
 import com.faustas.dbms.framework.annotations.Service;
+import com.faustas.dbms.framework.annotations.Value;
 import com.faustas.dbms.framework.interfaces.Shutdownable;
 import com.faustas.dbms.framework.repositories.RepositoryProxy;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.nio.file.Files;
@@ -32,6 +34,8 @@ public class ApplicationContext {
                 Class.forName(databaseDriver);
             }
 
+            createdServices.add(this);
+
             Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
@@ -45,7 +49,8 @@ public class ApplicationContext {
         }
 
         Object service = createdServices.stream()
-                .filter(classType::isInstance).findFirst().orElse(null);
+                .filter(classType::isInstance)
+                .findFirst().orElse(null);
         if (service != null) {
             return (T) service;
         }
@@ -61,11 +66,11 @@ public class ApplicationContext {
 
         Constructor<?> constructor = constructors[0];
         List<Object> constructorArguments = new ArrayList<>();
-        for (Class<?> argClass : constructor.getParameterTypes()) {
-            if (argClass.isAssignableFrom(this.getClass())) {
-                constructorArguments.add(this);
+        for (Parameter parameter: constructor.getParameters()) {
+            if (parameter.isAnnotationPresent(Value.class)) {
+                constructorArguments.add(getInjectableProperty(parameter.getAnnotation(Value.class)));
             } else {
-                constructorArguments.add(getBean(argClass));
+                constructorArguments.add(getBean(parameter.getType()));
             }
         }
 
@@ -85,6 +90,23 @@ public class ApplicationContext {
     public String getProperty(String name, String defaultValue) {
         String value = getProperty(name);
         return value == null ? defaultValue : value;
+    }
+
+    private String getInjectableProperty(Value value) {
+        String property = value.value();
+        String defaultValue = null;
+
+        if (property.indexOf(':') >= 0) {
+            String[] splits = property.split(":");
+            if (splits.length != 2) {
+                throw new RuntimeException("If you want to provide default value for property separate it by one ':'");
+            }
+
+            property = splits[0];
+            defaultValue = splits[1];
+        }
+
+        return getProperty(property, defaultValue);
     }
 
     private void scanForServiceClasses(Package basePackage) throws IOException, ClassNotFoundException {
