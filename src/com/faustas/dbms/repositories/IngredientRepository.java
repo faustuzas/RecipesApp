@@ -7,7 +7,7 @@ import com.faustas.dbms.models.Recipe;
 import java.util.List;
 
 @Repository(Ingredient.class)
-public interface IngredientsRepository {
+public interface IngredientRepository {
 
     @Select("SELECT * FROM ingredients")
     @Results({
@@ -21,9 +21,15 @@ public interface IngredientsRepository {
     })
     Ingredient findById(@Param("id") Integer id);
 
+    @Select("SELECT * FROM ingredients WHERE recipe_id = #recipeId")
+    @Results({
+            @Result(column = "product_id", property = "product", exec = @Exec(aClass = ProductRepository.class))
+    })
+    List<Ingredient> findByRecipeId(@Param("recipeId") Integer recipeId);
+
     @Insert("INSERT INTO ingredients (amount, product_id, recipe_id) " +
             "VALUES (#i.amount, #i.product.id, #r.id)")
-    void insert(@Param("i") Ingredient ingredient, @Param("r") Recipe recipe);
+    void insertForRecipe(@Param("i") Ingredient ingredient, @Param("r") Recipe recipe);
 
     @Update("UPDATE ingredients " +
             "SET amount = #i.amount, product_id = #i.product.id " +
