@@ -42,7 +42,7 @@ public class RepositoryProxy implements InvocationHandler {
                 return deleteExecutor.execute(method, args);
             }
         } catch (IOException | SQLException | ReflectiveOperationException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
 
         throw new RuntimeException("Make sure method called have needed annotations");

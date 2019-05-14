@@ -24,6 +24,10 @@ public class ApplicationContext {
 
     private Set<Object> createdServices = new HashSet<>();
 
+    public ApplicationContext(Class application) {
+        this(application, "resources/application.properties");
+    }
+
     public ApplicationContext(Class application, String pathToProperties) {
         try {
             loadProperties(pathToProperties);
@@ -57,7 +61,7 @@ public class ApplicationContext {
 
         Class requiredClass = scannedClasses.stream()
                 .filter(classType::isAssignableFrom).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No implementation for this class found"));
+                .orElseThrow(() -> new IllegalArgumentException("No implementation for this class found. Make sure you annotated injectable class with @Service"));
 
         Constructor<?>[] constructors = requiredClass.getConstructors();
         if (constructors.length != 1) {
