@@ -1,9 +1,11 @@
 package com.faustas.dbms.models;
 
+import com.faustas.dbms.interfaces.Identifiable;
+
 import java.util.Date;
 import java.util.List;
 
-public class Recipe {
+public class Recipe implements Identifiable {
 
     private Integer id;
 
@@ -16,8 +18,6 @@ public class Recipe {
     private List<Ingredient> ingredients;
 
     private List<Review> reviews;
-
-    private Double averageStars;
 
     private Date createdAt;
 
@@ -71,14 +71,6 @@ public class Recipe {
         this.reviews = reviews;
     }
 
-    public Double getAverageStars() {
-        return averageStars;
-    }
-
-    public void setAverageStars(Double averageStars) {
-        this.averageStars = averageStars;
-    }
-
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -104,7 +96,6 @@ public class Recipe {
                 ", minutesToPrepare=" + minutesToPrepare +
                 ", ingredients=" + ingredients +
                 ", reviews=" + reviews +
-                ", averageStars=" + averageStars +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

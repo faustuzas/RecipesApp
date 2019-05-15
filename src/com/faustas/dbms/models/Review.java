@@ -1,8 +1,10 @@
 package com.faustas.dbms.models;
 
+import com.faustas.dbms.interfaces.Identifiable;
+
 import java.util.Date;
 
-public class Review {
+public class Review implements Identifiable {
 
     private Integer id;
 

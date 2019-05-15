@@ -2,6 +2,7 @@ package com.faustas.dbms.services;
 
 import com.faustas.dbms.framework.annotations.Service;
 import com.faustas.dbms.models.Recipe;
+import com.faustas.dbms.models.TopRecipe;
 import com.faustas.dbms.repositories.RecipeRepository;
 
 import java.util.List;
@@ -21,5 +22,9 @@ public class RecipeService {
 
     public Recipe findById(Integer id) {
         return recipeRepository.findById(id);
+    }
+
+    public List<TopRecipe> findTop() {
+        return recipeRepository.findTop();
     }
 }

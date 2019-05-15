@@ -24,6 +24,10 @@ public class SelectQueryExecutor extends QueryExecutor {
         ResultSet resultSet = (ResultSet) executeQuery(selectAnnotation.value(), constructNamedArgs(method, args));
 
         Class<?> returnClass = method.getDeclaringClass().getAnnotation(Repository.class).value();
+        if (!selectAnnotation.resultClass().equals(void.class)) {
+            returnClass = selectAnnotation.resultClass();
+        }
+
         List<Object> createdObjects = new ArrayList<>();
 
         Results resultsMeta = method.getAnnotation(Results.class);
@@ -39,7 +43,7 @@ public class SelectQueryExecutor extends QueryExecutor {
                 List<Result> columnMetas = findColumnMetas(columnName, resultsMeta);
 
                 if (columnMetas.size() == 0) {
-                    Method setter = findSetter(returnObject, columnName);
+                    Method setter = findSetter(returnObject, convertToCamelCase(columnName));
                     /*
                      * Object could not have setter for some relational field
                      * E.g. recipe table can have user_id, but recipe does not have property user
@@ -51,9 +55,11 @@ public class SelectQueryExecutor extends QueryExecutor {
                 }
 
                 for (Result columnMeta : columnMetas) {
-                    String objectProperty = columnName;
+                    String objectProperty;
                     if (!columnMeta.property().isEmpty()) {
                         objectProperty = columnMeta.property();
+                    } else {
+                        objectProperty = convertToCamelCase(columnName);
                     }
 
                     Method setter = findSetter(returnObject, objectProperty);
@@ -93,6 +99,24 @@ public class SelectQueryExecutor extends QueryExecutor {
         }
 
         return createdObjects.size() == 0 ? null : createdObjects.get(0);
+    }
+
+    private String convertToCamelCase(String columnName) {
+        String[] splits = columnName.split("_");
+        if (splits.length == 0) {
+            return columnName;
+        }
+
+        StringBuilder sb = new StringBuilder(splits[0]);
+        for (int i = 1; i < splits.length; ++i) {
+            char firstLetter = splits[i].charAt(0);
+            if (Character.isAlphabetic(firstLetter)) {
+                firstLetter = Character.toUpperCase(firstLetter);
+            }
+            sb.append(firstLetter).append(splits[i].substring(1));
+        }
+
+        return sb.toString();
     }
 
     @Override

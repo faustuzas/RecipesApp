@@ -11,21 +11,12 @@ import java.util.List;
 public interface ReviewRepository {
 
     @Select("SELECT * FROM reviews")
-    @Results({
-            @Result(column = "created_at", property = "createdAt")
-    })
     List<Review> findAll();
 
     @Select("SELECT * FROM reviews WHERE id = #id")
-    @Results({
-            @Result(column = "created_at", property = "createdAt")
-    })
     Review findById(@Param("id") Integer id);
 
     @Select("SELECT * FROM reviews WHERE recipe_id = #recipeId")
-    @Results({
-            @Result(column = "created_at", property = "createdAt")
-    })
     List<Review> findByRecipeId(@Param("recipeId") Integer recipeId);
 
     @Insert("INSERT INTO reviews (comment, stars, user_id, recipe_id) " +
@@ -39,4 +30,7 @@ public interface ReviewRepository {
 
     @Delete("DELETE FROM reviews WHERE id = #r.id")
     void delete(@Param("r") Review review);
+
+    @Sql("REFRESH MATERIALIZED VIEW top_recipes_with_authors")
+    void refreshTop();
 }

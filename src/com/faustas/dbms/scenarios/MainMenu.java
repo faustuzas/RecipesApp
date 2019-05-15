@@ -4,6 +4,7 @@ import com.faustas.dbms.framework.ApplicationContext;
 import com.faustas.dbms.framework.annotations.Service;
 import com.faustas.dbms.interfaces.ScenarioProvider;
 import com.faustas.dbms.interfaces.SecurityContext;
+import com.faustas.dbms.models.User;
 import com.faustas.dbms.services.ConsoleInteractor;
 
 @Service
@@ -20,6 +21,10 @@ public class MainMenu implements ScenarioProvider {
         this.applicationContext = applicationContext;
         this.securityContext = securityContext;
         this.interactor = interactor;
+
+        User user = new User();
+        user.setId(1);
+        securityContext.setAuthenticatedUser(user);
     }
 
     @Override
@@ -43,7 +48,7 @@ public class MainMenu implements ScenarioProvider {
         while (true) {
             switch (interactor.getString()) {
                 case "1":
-                    return null;
+                    return applicationContext.getBean(ViewTopRecipesScenario.class);
                 case "2":
                     return applicationContext.getBean(ViewAllRecipesScenario.class);
                 case "3":
@@ -53,7 +58,7 @@ public class MainMenu implements ScenarioProvider {
                 case "5":
                     return applicationContext.getBean(LogoutScenario.class);
                 case "Q": case "q":
-                    return applicationContext.getBean(ExitScenario.class);
+                    return applicationContext.getBean(BackScenario.class);
                 default:
                     printHelp();
             }

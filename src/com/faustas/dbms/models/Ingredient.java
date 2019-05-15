@@ -1,6 +1,8 @@
 package com.faustas.dbms.models;
 
-public class Ingredient {
+import com.faustas.dbms.interfaces.Identifiable;
+
+public class Ingredient implements Identifiable {
 
     private Integer id;
 

@@ -12,6 +12,6 @@ public class BackScenario extends ConsoleScenario {
 
     @Override
     public boolean action() {
-        return true;
+        return false;
     }
 }

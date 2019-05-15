@@ -22,7 +22,7 @@ public class AuthenticationScenario extends ConsoleScenario {
         while (true) {
             interactor.print("1. Login");
             interactor.print("2. Register");
-            interactor.print("3. Exit");
+            interactor.print("Q. Exit");
 
             switch (interactor.getString()) {
                 case "1": {
@@ -72,7 +72,7 @@ public class AuthenticationScenario extends ConsoleScenario {
                     }
                     break;
                 }
-                case "3": return false;
+                case "Q": case "q": return false;
                 default: printHelp();
             }
         }

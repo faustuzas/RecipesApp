@@ -61,10 +61,9 @@ public class ConsoleInteractor {
     }
 
     public void printWithBorderAndColor(String message, ConsoleColor color) {
-        double paddingLength = (BORDER_LENGTH - message.length()) / 2;
 
         print(getMultipleSymbol('*', BORDER_LENGTH));
-        printWithColor(getMultipleSymbol(' ', paddingLength) + message, color);
+        printWithColor(centerMessage(message), color);
         print(getMultipleSymbol('*', BORDER_LENGTH));
     }
 
@@ -88,6 +87,10 @@ public class ConsoleInteractor {
         print(color.getColor() + message + ConsoleColor.RESET.getColor());
     }
 
+    public void printCentered(String message) {
+        print(centerMessage(message));
+    }
+
     private String getMultipleSymbol(char c, double count) {
         return getMultipleSymbol(c, (int)Math.round(count));
     }
@@ -98,5 +101,10 @@ public class ConsoleInteractor {
             sb.append(c);
         }
         return sb.toString();
+    }
+
+    private String centerMessage(String message) {
+        double paddingLength = (BORDER_LENGTH - message.length()) / 2;
+        return getMultipleSymbol(' ', paddingLength) + message;
     }
 }

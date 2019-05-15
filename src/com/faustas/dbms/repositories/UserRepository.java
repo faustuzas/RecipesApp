@@ -9,15 +9,9 @@ import java.util.List;
 public interface UserRepository {
 
     @Select("SELECT * FROM users")
-    @Results({
-            @Result(column = "created_at", property = "createdAt")
-    })
     List<User> findAll();
 
     @Select("SELECT * FROM users WHERE email = #email AND password = #password")
-    @Results({
-            @Result(column = "created_at", property = "createdAt")
-    })
     User findByEmailAndPassword(@Param("email") String email, @Param("password") String password);
 
     @Insert("INSERT INTO users (name, email, password)" +

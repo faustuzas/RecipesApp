@@ -1,6 +1,8 @@
 package com.faustas.dbms.models;
 
-public class Product {
+import com.faustas.dbms.interfaces.Identifiable;
+
+public class Product implements Identifiable {
 
     private Integer id;
 

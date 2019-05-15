@@ -1,7 +1,7 @@
 package com.faustas.dbms.scenarios;
 
 import com.faustas.dbms.framework.ApplicationContext;
-import com.faustas.dbms.models.Recipe;
+import com.faustas.dbms.interfaces.Identifiable;
 import com.faustas.dbms.services.ConsoleInteractor;
 import com.faustas.dbms.services.RecipeService;
 import com.faustas.dbms.utils.MapBuilder;
@@ -20,24 +20,26 @@ public abstract class ViewRecipesScenario extends ConsoleScenario {
         this.applicationContext = applicationContext;
     }
 
-    abstract List<Recipe> selectRecipes();
+    abstract List<? extends Identifiable> getSelectables();
 
     abstract String getTitle();
 
+    abstract void printRecipes();
+
     @Override
     public boolean action() {
-        interactor.printHeader(getTitle());
+        do {
+            interactor.printHeader(getTitle());
+            printRecipes();
+        } while (selectOption().action());
 
-        List<Recipe> recipes = selectRecipes();
-        printRecipes(recipes);
-
-        return selectOption(recipes).action();
+        return true;
     }
 
     /**
      * Can be overridden to extend functionality
      */
-    ConsoleScenario selectOption(List<Recipe> recipes) {
+    ConsoleScenario selectOption() {
         interactor.printSeparator();
         while (true) {
             interactor.print("1. View recipe");
@@ -48,7 +50,7 @@ public abstract class ViewRecipesScenario extends ConsoleScenario {
                     try {
                         Integer recipeId = Integer.valueOf(interactor.getString("Recipe id > "));
                         // Check if given id is in the list
-                        recipes.stream().filter(r -> r.getId().equals(recipeId)).findFirst()
+                        getSelectables().stream().filter(s -> s.getId().equals(recipeId)).findFirst()
                                 .orElseThrow(NumberFormatException::new);
 
                         return applicationContext.getBean(ViewRecipeScenario.class, MapBuilder.ofPair("recipeId", recipeId));
@@ -56,18 +58,11 @@ public abstract class ViewRecipesScenario extends ConsoleScenario {
                         interactor.printError("Enter valid recipe id");
                         break;
                     }
-                case "Q":
+                case "Q": case "q":
                     return applicationContext.getBean(BackScenario.class);
                 default:
                     printHelp();
             }
-        }
-    }
-
-    private void printRecipes(List<Recipe> recipes) {
-        for (Recipe recipe : recipes) {
-            interactor.print(String.format(
-                    "%d. %s (%s minutes) Stars: %.2f", recipe.getId(), recipe.getTitle(), recipe.getMinutesToPrepare(), recipe.getAverageStars()));
         }
     }
 }

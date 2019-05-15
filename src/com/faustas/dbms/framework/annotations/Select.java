@@ -9,4 +9,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Select {
     String value();
+
+    Class resultClass() default void.class;
 }

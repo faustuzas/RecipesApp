@@ -2,6 +2,7 @@ package com.faustas.dbms.repositories;
 
 import com.faustas.dbms.framework.annotations.*;
 import com.faustas.dbms.models.Recipe;
+import com.faustas.dbms.models.TopRecipe;
 import com.faustas.dbms.models.User;
 
 import java.util.List;
@@ -9,11 +10,7 @@ import java.util.List;
 @Repository(Recipe.class)
 public interface RecipeRepository {
 
-    @Select("SELECT * FROM recipes_with_average_stars")
-    @Results({
-            @Result(column = "minutes_to_prepare", property = "minutesToPrepare"),
-            @Result(column = "average_stars", property = "averageStars")
-    })
+    @Select("SELECT * FROM recipes")
     List<Recipe> findAll();
 
     @Select("SELECT * FROM recipes WHERE id = #id")
@@ -21,18 +18,10 @@ public interface RecipeRepository {
             @Result(column = "id", property = "id"),
             @Result(column = "id", property = "ingredients", exec = @Exec(aClass = IngredientRepository.class, method = "findByRecipeId")),
             @Result(column = "id", property = "reviews", exec = @Exec(aClass = ReviewRepository.class, method = "findByRecipeId")),
-            @Result(column = "minutes_to_prepare", property = "minutesToPrepare"),
-            @Result(column = "created_at", property = "createdAt"),
-            @Result(column = "updated_at", property = "updatedAt")
     })
     Recipe findById(@Param("id") Integer id);
 
     @Select("SELECT * FROM recipes WHERE title ILIKE '%#title%'")
-    @Results({
-            @Result(column = "id", property = "id"),
-            @Result(column = "created_at", property = "createdAt"),
-            @Result(column = "updated_at", property = "updatedAt")
-    })
     List<Recipe> searchByName(@Param("title") String title);
 
     @Insert("INSERT INTO recipes (title, description, minutes_to_prepare, author_id) " +
@@ -50,4 +39,11 @@ public interface RecipeRepository {
 
     @Delete("DELETE FROM recipes WHERE id IN (@ids)")
     void delete(@Param("ids") Integer[] ids);
+
+    @Select(value = "SELECT * FROM top_recipes_with_authors", resultClass = TopRecipe.class)
+    @Results({
+            @Result(column = "name", property = "authorName"),
+            @Result(column = "recipe_id", property = "id")
+    })
+    List<TopRecipe> findTop();
 }

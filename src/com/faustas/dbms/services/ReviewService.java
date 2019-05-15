@@ -17,5 +17,6 @@ public class ReviewService {
 
     public void addFrom(Review review, User user, Recipe recipe) {
         reviewRepository.insertFromUser(review, user, recipe);
+        reviewRepository.refreshTop();
     }
 }
