@@ -1,5 +1,6 @@
 package com.faustas.dbms.framework;
 
+import com.faustas.dbms.Main;
 import com.faustas.dbms.framework.annotations.Repository;
 import com.faustas.dbms.framework.annotations.Service;
 import com.faustas.dbms.framework.annotations.Value;
@@ -46,8 +47,12 @@ public class ApplicationContext {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T getBean(Class<T> classType) {
+        return getBean(classType, new HashMap<>());
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getBean(Class<T> classType, Map<String, Object> additionalProperties) {
         if (classType.isAnnotationPresent(Repository.class)) {
             return getRepository(classType);
         }
@@ -72,7 +77,7 @@ public class ApplicationContext {
         List<Object> constructorArguments = new ArrayList<>();
         for (Parameter parameter: constructor.getParameters()) {
             if (parameter.isAnnotationPresent(Value.class)) {
-                constructorArguments.add(getInjectableProperty(parameter.getAnnotation(Value.class)));
+                constructorArguments.add(getInjectableProperty(parameter.getAnnotation(Value.class), additionalProperties));
             } else {
                 constructorArguments.add(getBean(parameter.getType()));
             }
@@ -80,7 +85,12 @@ public class ApplicationContext {
 
         try {
             Object createdService = constructor.newInstance(constructorArguments.toArray());
-            createdServices.add(createdService);
+            Service serviceMeta = createdService.getClass().getAnnotation(Service.class);
+
+            if (serviceMeta.singleton()) {
+                createdServices.add(createdService);
+            }
+
             return (T) createdService;
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException("Unable to instantiate wanted service: " + classType.getName());
@@ -96,7 +106,7 @@ public class ApplicationContext {
         return value == null ? defaultValue : value;
     }
 
-    private String getInjectableProperty(Value value) {
+    private Object getInjectableProperty(Value value, Map<String, Object> additionalProperties) {
         String property = value.value();
         String defaultValue = null;
 
@@ -108,6 +118,10 @@ public class ApplicationContext {
 
             property = splits[0];
             defaultValue = splits[1];
+        }
+
+        if (additionalProperties.containsKey(property)) {
+            return additionalProperties.get(property);
         }
 
         return getProperty(property, defaultValue);

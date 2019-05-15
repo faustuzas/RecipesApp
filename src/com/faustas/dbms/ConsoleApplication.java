@@ -26,7 +26,7 @@ public class ConsoleApplication implements Bootable {
             ConsoleScenario scenario = scenarioProvider.getScenario();
 
             // if action returns false, it means application should quit
-            if (!scenario.action()) {
+            if (scenario == null || !scenario.action()) {
                 break;
             }
         }
@@ -39,6 +39,6 @@ public class ConsoleApplication implements Bootable {
     }
 
     private void printGoodbye() {
-        interactor.printWithBorderAndColor("         GOOD BYE          ");
+        interactor.printWithBorderAndColor("GOOD BYE");
     }
 }

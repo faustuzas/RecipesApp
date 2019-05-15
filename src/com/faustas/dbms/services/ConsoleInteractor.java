@@ -9,7 +9,10 @@ import java.util.Scanner;
 @Service
 public class ConsoleInteractor {
     private static final ConsoleColor DEFAULT_COLOR = ConsoleColor.CYAN;
+    private static final ConsoleColor HEADER_COLOR = ConsoleColor.GREEN;
+    private static final ConsoleColor SECTION_HEADER_COLOR = ConsoleColor.CYAN;
     private static final ConsoleColor ERROR_COLOR = ConsoleColor.RED;
+    private static final int BORDER_LENGTH = 50;
 
     private Scanner scanner = new Scanner(System.in);
 
@@ -17,8 +20,17 @@ public class ConsoleInteractor {
         System.out.println(message);
     }
 
+    public String ask(String message) {
+        print(message);
+        return getString();
+    }
+
     public String getString() {
-        System.out.print("> ");
+        return getString("> ");
+    }
+
+    public String getString(String message) {
+        System.out.print(message);
         return scanner.nextLine();
     }
 
@@ -36,21 +48,36 @@ public class ConsoleInteractor {
         return new String(passwordArray);
     }
 
+    public void printSeparator() {
+        printSeparator('-');
+    }
+
+    public void printSeparator(char separatorChar) {
+        print(getMultipleSymbol(separatorChar, BORDER_LENGTH));
+    }
+
     public void printWithBorderAndColor(String message) {
         printWithBorderAndColor(message, DEFAULT_COLOR);
     }
 
     public void printWithBorderAndColor(String message, ConsoleColor color) {
-        double borderLength = message.length() * 1.5;
-        double paddingLength = (borderLength - message.length()) / 2;
+        double paddingLength = (BORDER_LENGTH - message.length()) / 2;
 
-        print(getMultipleSymbol('*', borderLength));
+        print(getMultipleSymbol('*', BORDER_LENGTH));
         printWithColor(getMultipleSymbol(' ', paddingLength) + message, color);
-        print(getMultipleSymbol('*', borderLength));
+        print(getMultipleSymbol('*', BORDER_LENGTH));
     }
 
     public void printError(String error) {
         printWithColor(error, ERROR_COLOR);
+    }
+
+    public void printHeader(String header) {
+        printWithBorderAndColor(header, HEADER_COLOR);
+    }
+
+    public void printSectionHeader(String sectionHeader) {
+        printWithColor(sectionHeader, SECTION_HEADER_COLOR);
     }
 
     public void printWithColor(String message) {

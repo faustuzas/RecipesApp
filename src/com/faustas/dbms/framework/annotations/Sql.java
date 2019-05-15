@@ -4,7 +4,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Service {
+public @interface Sql {
 
-    boolean singleton() default true;
+    String value();
 }

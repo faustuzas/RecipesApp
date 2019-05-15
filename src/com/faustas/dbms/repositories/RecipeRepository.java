@@ -9,14 +9,10 @@ import java.util.List;
 @Repository(Recipe.class)
 public interface RecipeRepository {
 
-    @Select("SELECT * FROM recipes")
+    @Select("SELECT * FROM recipes_with_average_stars")
     @Results({
-            @Result(column = "id", property = "id"),
-            @Result(column = "id", property = "ingredients", exec = @Exec(aClass = IngredientRepository.class, method = "findByRecipeId")),
-            @Result(column = "id", property = "reviews", exec = @Exec(aClass = ReviewRepository.class, method = "findByReviewId")),
             @Result(column = "minutes_to_prepare", property = "minutesToPrepare"),
-            @Result(column = "created_at", property = "createdAt"),
-            @Result(column = "updated_at", property = "updatedAt")
+            @Result(column = "average_stars", property = "averageStars")
     })
     List<Recipe> findAll();
 
@@ -24,7 +20,7 @@ public interface RecipeRepository {
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "id", property = "ingredients", exec = @Exec(aClass = IngredientRepository.class, method = "findByRecipeId")),
-            @Result(column = "id", property = "reviews", exec = @Exec(aClass = ReviewRepository.class, method = "findByReviewId")),
+            @Result(column = "id", property = "reviews", exec = @Exec(aClass = ReviewRepository.class, method = "findByRecipeId")),
             @Result(column = "minutes_to_prepare", property = "minutesToPrepare"),
             @Result(column = "created_at", property = "createdAt"),
             @Result(column = "updated_at", property = "updatedAt")

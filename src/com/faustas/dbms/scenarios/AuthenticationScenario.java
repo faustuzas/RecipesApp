@@ -2,18 +2,20 @@ package com.faustas.dbms.scenarios;
 
 import com.faustas.dbms.exceptions.AuthenticationFailed;
 import com.faustas.dbms.exceptions.RegistrationFailedException;
+import com.faustas.dbms.framework.ApplicationContext;
 import com.faustas.dbms.framework.annotations.Service;
 import com.faustas.dbms.interfaces.Authenticator;
 import com.faustas.dbms.services.ConsoleInteractor;
 import com.faustas.dbms.utils.UserRegistrationInfo;
 
 @Service
-public class AuthenticationConsoleScenario extends ConsoleScenario {
+public class AuthenticationScenario extends ConsoleScenario {
 
     private Authenticator authenticator;
 
-    public AuthenticationConsoleScenario(ConsoleInteractor interactor, Authenticator authenticator) {
-        super(interactor);
+    public AuthenticationScenario(ConsoleInteractor interactor, ApplicationContext applicationContext,
+                                  Authenticator authenticator) {
+        super(interactor, applicationContext);
         this.authenticator = authenticator;
     }
 
@@ -26,12 +28,12 @@ public class AuthenticationConsoleScenario extends ConsoleScenario {
 
             switch (interactor.getString()) {
                 case "1": {
-                    interactor.print("Enter your email");
-                    String email = interactor.getString();
+                    String email = interactor.ask("Enter your email");
                     interactor.print("Enter your password");
                     String password = interactor.getPassword();
                     try {
                         authenticator.login(email, password);
+                        interactor.printWithColor("Successfully authenticated");
                         return true;
                     } catch (AuthenticationFailed authenticationFailed) {
                         interactor.printError("User authentication failed. Try again");
@@ -40,10 +42,9 @@ public class AuthenticationConsoleScenario extends ConsoleScenario {
                 }
                 case "2": {
                     UserRegistrationInfo.Builder builder = new UserRegistrationInfo.Builder();
-                    interactor.print("Enter your name");
-                    builder.name(interactor.getString());
-                    interactor.print("Enter your email");
-                    builder.email(interactor.getString());
+                    builder.name(interactor.ask("Enter your name"));
+                    builder.email(interactor.ask("Enter your email"));
+
                     while (true) {
                         interactor.print("Enter your password");
                         String password = interactor.getPassword();
@@ -54,10 +55,13 @@ public class AuthenticationConsoleScenario extends ConsoleScenario {
                             continue;
                         }
                         builder.password(password);
+
                         try {
                             authenticator.register(builder.build());
+                            interactor.printWithColor("Successfully registered");
                             return true;
                         } catch (RegistrationFailedException e) {
+                            // TODO: Refactor into better exception handling
                             if (e.getMessage().contains("users_email_key")) {
                                 interactor.printError("User with this email already exists");
                             } else if (e.getMessage().contains("users_email_check")) {

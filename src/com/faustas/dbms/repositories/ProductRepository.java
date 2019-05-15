@@ -10,19 +10,25 @@ public interface ProductRepository {
 
     @Select("SELECT * FROM products")
     @Results({
-            @Result(column = "fat", property = "fats")
+            @Result(column = "carbohydrates_per_100g", property = "carbohydrates"),
+            @Result(column = "proteins_per_100g", property = "proteins"),
+            @Result(column = "fat_per_100g", property = "fats")
     })
     List<Product> findAll();
 
     @Select("SELECT * FROM products WHERE id = #id")
     @Results({
-            @Result(column = "fat", property = "fats")
+            @Result(column = "carbohydrates_per_100g", property = "carbohydrates"),
+            @Result(column = "proteins_per_100g", property = "proteins"),
+            @Result(column = "fat_per_100g", property = "fats")
     })
     Product findById(@Param("id") Integer id);
 
     @Select("SELECT * FROM products WHERE name ILIKE '%#name%'")
     @Results({
-            @Result(column = "fat", property = "fats")
+            @Result(column = "carbohydrates_per_100g", property = "carbohydrates"),
+            @Result(column = "proteins_per_100g", property = "proteins"),
+            @Result(column = "fat_per_100g", property = "fats")
     })
     List<Product> searchByName(@Param("name") String name);
 

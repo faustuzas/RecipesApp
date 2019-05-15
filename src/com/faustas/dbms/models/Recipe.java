@@ -17,6 +17,8 @@ public class Recipe {
 
     private List<Review> reviews;
 
+    private Double averageStars;
+
     private Date createdAt;
 
     private Date updatedAt;
@@ -69,6 +71,14 @@ public class Recipe {
         this.reviews = reviews;
     }
 
+    public Double getAverageStars() {
+        return averageStars;
+    }
+
+    public void setAverageStars(Double averageStars) {
+        this.averageStars = averageStars;
+    }
+
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -94,6 +104,7 @@ public class Recipe {
                 ", minutesToPrepare=" + minutesToPrepare +
                 ", ingredients=" + ingredients +
                 ", reviews=" + reviews +
+                ", averageStars=" + averageStars +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
