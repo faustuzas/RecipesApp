@@ -4,14 +4,14 @@ import com.faustas.dbms.framework.annotations.Service;
 import com.faustas.dbms.services.ConsoleInteractor;
 
 @Service
-public class ExitScenario extends ConsoleScenario {
+public class BackScenario extends ConsoleScenario {
 
-    public ExitScenario(ConsoleInteractor interactor) {
+    public BackScenario(ConsoleInteractor interactor) {
         super(interactor);
     }
 
     @Override
     public boolean action() {
-        return false;
+        return true;
     }
 }

@@ -2,7 +2,6 @@ package com.faustas.dbms.scenarios;
 
 import com.faustas.dbms.exceptions.AuthenticationFailed;
 import com.faustas.dbms.exceptions.RegistrationFailedException;
-import com.faustas.dbms.framework.ApplicationContext;
 import com.faustas.dbms.framework.annotations.Service;
 import com.faustas.dbms.interfaces.Authenticator;
 import com.faustas.dbms.services.ConsoleInteractor;
@@ -13,9 +12,8 @@ public class AuthenticationScenario extends ConsoleScenario {
 
     private Authenticator authenticator;
 
-    public AuthenticationScenario(ConsoleInteractor interactor, ApplicationContext applicationContext,
-                                  Authenticator authenticator) {
-        super(interactor, applicationContext);
+    public AuthenticationScenario(ConsoleInteractor interactor, Authenticator authenticator) {
+        super(interactor);
         this.authenticator = authenticator;
     }
 

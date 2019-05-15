@@ -4,17 +4,20 @@ import com.faustas.dbms.framework.ApplicationContext;
 import com.faustas.dbms.models.Recipe;
 import com.faustas.dbms.services.ConsoleInteractor;
 import com.faustas.dbms.services.RecipeService;
+import com.faustas.dbms.utils.MapBuilder;
 
-import java.util.HashMap;
 import java.util.List;
 
 public abstract class ViewRecipesScenario extends ConsoleScenario {
 
     RecipeService recipeService;
 
+    ApplicationContext applicationContext;
+
     public ViewRecipesScenario(ConsoleInteractor interactor, ApplicationContext applicationContext, RecipeService recipeService) {
-        super(interactor, applicationContext);
+        super(interactor);
         this.recipeService = recipeService;
+        this.applicationContext = applicationContext;
     }
 
     abstract List<Recipe> selectRecipes();
@@ -38,7 +41,7 @@ public abstract class ViewRecipesScenario extends ConsoleScenario {
         interactor.printSeparator();
         while (true) {
             interactor.print("1. View recipe");
-            interactor.print("Q. Exit");
+            interactor.print("Q. Back");
 
             switch (interactor.getString()) {
                 case "1":
@@ -48,15 +51,13 @@ public abstract class ViewRecipesScenario extends ConsoleScenario {
                         recipes.stream().filter(r -> r.getId().equals(recipeId)).findFirst()
                                 .orElseThrow(NumberFormatException::new);
 
-                        HashMap<String, Object> args = new HashMap<>();
-                        args.put("recipeId", recipeId);
-                        return applicationContext.getBean(ViewRecipeScenario.class, args);
+                        return applicationContext.getBean(ViewRecipeScenario.class, MapBuilder.ofPair("recipeId", recipeId));
                     } catch (NumberFormatException e) {
                         interactor.printError("Enter valid recipe id");
                         break;
                     }
                 case "Q":
-                    return applicationContext.getBean(ExitScenario.class);
+                    return applicationContext.getBean(BackScenario.class);
                 default:
                     printHelp();
             }

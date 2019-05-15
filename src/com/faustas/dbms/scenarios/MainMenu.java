@@ -24,9 +24,9 @@ public class MainMenu implements ScenarioProvider {
 
     @Override
     public ConsoleScenario getScenario() {
-//        if (securityContext.getAuthenticatedUser() == null) {
-//            return applicationContext.getBean(AuthenticationScenario.class);
-//        }
+        if (securityContext.getAuthenticatedUser() == null) {
+            return applicationContext.getBean(AuthenticationScenario.class);
+        }
 
         return getScenarioFromMenu();
     }
@@ -43,9 +43,9 @@ public class MainMenu implements ScenarioProvider {
         while (true) {
             switch (interactor.getString()) {
                 case "1":
-                    return applicationContext.getBean(ViewAllRecipesScenario.class);
-                case "2":
                     return null;
+                case "2":
+                    return applicationContext.getBean(ViewAllRecipesScenario.class);
                 case "3":
                     return null;
                 case "4":

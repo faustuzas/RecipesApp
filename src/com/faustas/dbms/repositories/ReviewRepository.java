@@ -1,6 +1,7 @@
 package com.faustas.dbms.repositories;
 
 import com.faustas.dbms.framework.annotations.*;
+import com.faustas.dbms.models.Recipe;
 import com.faustas.dbms.models.Review;
 import com.faustas.dbms.models.User;
 
@@ -27,9 +28,9 @@ public interface ReviewRepository {
     })
     List<Review> findByRecipeId(@Param("recipeId") Integer recipeId);
 
-    @Insert("INSERT INTO reviews (comment, stars, created_at) " +
-            "VALUES (#r.comment, #r.stars, #r.createdAt)")
-    void insertForUser(@Param("r") Review review, @Param("u") User user);
+    @Insert("INSERT INTO reviews (comment, stars, user_id, recipe_id) " +
+            "VALUES (#r.comment, #r.stars, #u.id, #re.id)")
+    void insertFromUser(@Param("r") Review review, @Param("u") User user, @Param("re") Recipe recipe);
 
     @Update("UPDATE reviews " +
             "SET comment = #r.comment, stars = #r.stars, created_at = #r.createdAt" +

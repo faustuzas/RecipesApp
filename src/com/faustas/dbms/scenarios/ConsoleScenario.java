@@ -1,17 +1,13 @@
 package com.faustas.dbms.scenarios;
 
-import com.faustas.dbms.framework.ApplicationContext;
 import com.faustas.dbms.services.ConsoleInteractor;
 
 public abstract class ConsoleScenario {
 
     ConsoleInteractor interactor;
 
-    ApplicationContext applicationContext;
-
-    public ConsoleScenario(ConsoleInteractor interactor, ApplicationContext applicationContext) {
+    public ConsoleScenario(ConsoleInteractor interactor) {
         this.interactor = interactor;
-        this.applicationContext = applicationContext;
     }
 
     /**
