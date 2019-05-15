@@ -18,7 +18,7 @@ public class LogoutScenario extends ConsoleScenario {
     @Override
     public boolean action() {
         securityContext.clear();
-        interactor.printWithColor("Logout successful", ConsoleColor.GREEN);
+        interactor.printSuccess("Logout successful");
         return true;
     }
 }

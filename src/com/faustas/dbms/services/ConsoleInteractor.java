@@ -9,7 +9,8 @@ import java.util.Scanner;
 @Service
 public class ConsoleInteractor {
     private static final ConsoleColor DEFAULT_COLOR = ConsoleColor.CYAN;
-    private static final ConsoleColor HEADER_COLOR = ConsoleColor.GREEN;
+    private static final ConsoleColor HEADER_COLOR = ConsoleColor.YELLOW;
+    private static final ConsoleColor SUCCESS_COLOR = ConsoleColor.GREEN;
     private static final ConsoleColor SECTION_HEADER_COLOR = ConsoleColor.CYAN;
     private static final ConsoleColor ERROR_COLOR = ConsoleColor.RED;
     private static final int BORDER_LENGTH = 50;
@@ -89,6 +90,10 @@ public class ConsoleInteractor {
 
     public void printCentered(String message) {
         print(centerMessage(message));
+    }
+
+    public void printSuccess(String message) {
+        printWithColor(message, SUCCESS_COLOR);
     }
 
     private String getMultipleSymbol(char c, double count) {

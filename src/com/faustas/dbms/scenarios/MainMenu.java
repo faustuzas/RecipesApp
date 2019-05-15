@@ -41,8 +41,9 @@ public class MainMenu implements ScenarioProvider {
         interactor.print("1. View top recipes");
         interactor.print("2. View all recipes");
         interactor.print("3. Add a recipe");
-        interactor.print("4. View your recipes");
-        interactor.print("5. Logout");
+        interactor.print("4. Add a product");
+        interactor.print("5. View your recipes");
+        interactor.print("6. Logout");
         interactor.print("Q. Exit");
 
         while (true) {
@@ -54,8 +55,10 @@ public class MainMenu implements ScenarioProvider {
                 case "3":
                     return null;
                 case "4":
-                    return null;
+                    return applicationContext.getBean(AddProductScenario.class);
                 case "5":
+                    return null;
+                case "6":
                     return applicationContext.getBean(LogoutScenario.class);
                 case "Q": case "q":
                     return applicationContext.getBean(BackScenario.class);

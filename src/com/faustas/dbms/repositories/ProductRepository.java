@@ -32,7 +32,7 @@ public interface ProductRepository {
     })
     List<Product> searchByName(@Param("name") String name);
 
-    @Insert("INSERT INTO products (name, carbohydrates, proteins, fat) " +
+    @Insert("INSERT INTO products (name, carbohydrates_per_100g, proteins_per_100g, fat_per_100g) " +
             "VALUES (#p.name, #p.carbohydrates, #p.proteins, #p.fats)")
     void insert(@Param("p") Product product);
 

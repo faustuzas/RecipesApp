@@ -26,12 +26,12 @@ public class AuthenticationScenario extends ConsoleScenario {
 
             switch (interactor.getString()) {
                 case "1": {
-                    String email = interactor.ask("Enter your email");
+                    String email = interactor.getString("Your email > ");
                     interactor.print("Enter your password");
                     String password = interactor.getPassword();
                     try {
                         authenticator.login(email, password);
-                        interactor.printWithColor("Successfully authenticated");
+                        interactor.printSuccess("Successfully authenticated");
                         return true;
                     } catch (AuthenticationFailed authenticationFailed) {
                         interactor.printError("User authentication failed. Try again");
@@ -40,8 +40,8 @@ public class AuthenticationScenario extends ConsoleScenario {
                 }
                 case "2": {
                     UserRegistrationInfo.Builder builder = new UserRegistrationInfo.Builder();
-                    builder.name(interactor.ask("Enter your name"));
-                    builder.email(interactor.ask("Enter your email"));
+                    builder.name(interactor.getString("Your name > "));
+                    builder.email(interactor.getString("Your email > "));
 
                     while (true) {
                         interactor.print("Enter your password");
@@ -56,7 +56,7 @@ public class AuthenticationScenario extends ConsoleScenario {
 
                         try {
                             authenticator.register(builder.build());
-                            interactor.printWithColor("Successfully registered");
+                            interactor.printSuccess("Successfully registered");
                             return true;
                         } catch (RegistrationFailedException e) {
                             // TODO: Refactor into better exception handling

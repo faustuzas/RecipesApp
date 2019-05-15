@@ -28,7 +28,7 @@ public class ViewRecipeScenario extends ConsoleScenario {
 
     @Override
     public boolean action() {
-        interactor.printWithBorderAndColor(recipe.getTitle());
+        interactor.printHeader(recipe.getTitle());
         interactor.print(recipe.getDescription());
         interactor.printSectionHeader("Ingredients:");
         for (Ingredient ingredient : recipe.getIngredients()) {

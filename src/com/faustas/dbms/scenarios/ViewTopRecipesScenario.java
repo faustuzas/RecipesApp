@@ -6,6 +6,7 @@ import com.faustas.dbms.interfaces.Identifiable;
 import com.faustas.dbms.models.TopRecipe;
 import com.faustas.dbms.services.ConsoleInteractor;
 import com.faustas.dbms.services.RecipeService;
+import com.faustas.dbms.utils.NumberReader;
 
 import java.util.List;
 
@@ -15,8 +16,8 @@ public class ViewTopRecipesScenario extends ViewRecipesScenario {
     List<TopRecipe> topRecipes;
 
     public ViewTopRecipesScenario(ConsoleInteractor interactor, ApplicationContext applicationContext,
-                                  RecipeService recipeService) {
-        super(interactor, applicationContext, recipeService);
+                                  RecipeService recipeService, NumberReader numberReader) {
+        super(interactor, applicationContext, recipeService, numberReader);
         this.topRecipes = recipeService.findTop();
     }
 

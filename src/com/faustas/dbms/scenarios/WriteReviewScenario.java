@@ -7,7 +7,7 @@ import com.faustas.dbms.models.Recipe;
 import com.faustas.dbms.models.Review;
 import com.faustas.dbms.services.ConsoleInteractor;
 import com.faustas.dbms.services.ReviewService;
-import com.faustas.dbms.utils.ConsoleColor;
+import com.faustas.dbms.utils.NumberReader;
 
 @Service(singleton = false)
 public class WriteReviewScenario extends ConsoleScenario {
@@ -18,35 +18,32 @@ public class WriteReviewScenario extends ConsoleScenario {
 
     private Recipe recipe;
 
+    private NumberReader numberReader;
+
     public WriteReviewScenario(ConsoleInteractor interactor, ReviewService reviewService,
-                               SecurityContext securityContext, @Value("recipe") Recipe recipe) {
+                               NumberReader numberReader, SecurityContext securityContext,
+                               @Value("recipe") Recipe recipe) {
         super(interactor);
         this.recipe = recipe;
         this.reviewService = reviewService;
         this.securityContext = securityContext;
+        this.numberReader = numberReader;
     }
 
     @Override
     public boolean action() {
         interactor.printHeader(String.format("Review for \"%s\"", recipe.getTitle()));
-        String comment = interactor.ask("Enter your opinion:");
 
-        Integer stars;
-        while (true) {
-            try {
-                stars = Integer.valueOf(interactor.ask("Stars (0-5)"));
-                break;
-            } catch (NumberFormatException e) {
-                interactor.printError("Please enter natural number from 0 to 5");
-            }
-        }
+        String comment = interactor.ask("Enter your opinion:");
+        interactor.print("Stars (0-5):");
+        Integer stars = numberReader.readInteger("Please enter natural number from 0 to 5");
 
         Review review = new Review();
         review.setComment(comment);
         review.setStars(stars);
 
         reviewService.addFrom(review, securityContext.getAuthenticatedUser(), recipe);
-        interactor.printWithColor("Review added!", ConsoleColor.GREEN);
+        interactor.printSuccess("Review added!");
 
         return true;
     }

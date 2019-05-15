@@ -5,6 +5,7 @@ import com.faustas.dbms.interfaces.Identifiable;
 import com.faustas.dbms.services.ConsoleInteractor;
 import com.faustas.dbms.services.RecipeService;
 import com.faustas.dbms.utils.MapBuilder;
+import com.faustas.dbms.utils.NumberReader;
 
 import java.util.List;
 
@@ -14,10 +15,14 @@ public abstract class ViewRecipesScenario extends ConsoleScenario {
 
     ApplicationContext applicationContext;
 
-    public ViewRecipesScenario(ConsoleInteractor interactor, ApplicationContext applicationContext, RecipeService recipeService) {
+    private NumberReader numberReader;
+
+    public ViewRecipesScenario(ConsoleInteractor interactor, ApplicationContext applicationContext,
+                               RecipeService recipeService, NumberReader numberReader) {
         super(interactor);
         this.recipeService = recipeService;
         this.applicationContext = applicationContext;
+        this.numberReader = numberReader;
     }
 
     abstract List<? extends Identifiable> getSelectables();
@@ -48,14 +53,14 @@ public abstract class ViewRecipesScenario extends ConsoleScenario {
             switch (interactor.getString()) {
                 case "1":
                     try {
-                        Integer recipeId = Integer.valueOf(interactor.getString("Recipe id > "));
                         // Check if given id is in the list
+                        Integer recipeId = numberReader.readInteger("Enter only recipe id");
                         getSelectables().stream().filter(s -> s.getId().equals(recipeId)).findFirst()
-                                .orElseThrow(NumberFormatException::new);
+                                .orElseThrow(IllegalArgumentException::new);
 
                         return applicationContext.getBean(ViewRecipeScenario.class, MapBuilder.ofPair("recipeId", recipeId));
-                    } catch (NumberFormatException e) {
-                        interactor.printError("Enter valid recipe id");
+                    } catch (IllegalArgumentException e) {
+                        interactor.printError("Recipe does not exist");
                         break;
                     }
                 case "Q": case "q":
