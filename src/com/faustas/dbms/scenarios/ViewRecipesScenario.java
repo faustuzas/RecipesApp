@@ -11,6 +11,8 @@ import java.util.List;
 
 public abstract class ViewRecipesScenario extends ConsoleScenario {
 
+    static final Integer EXTEND_FROM_OPTION = 2;
+
     RecipeService recipeService;
 
     ApplicationContext applicationContext;
@@ -31,6 +33,18 @@ public abstract class ViewRecipesScenario extends ConsoleScenario {
 
     abstract void printRecipes();
 
+    /**
+     * Can be overridden to extend functionality
+     */
+    void printMoreOptions() { }
+
+    /**
+     * Can be overridden to extend functionality
+     */
+    void handleSelection(String selection) {
+        printHelp();
+    }
+
     @Override
     public boolean action() {
         do {
@@ -41,28 +55,26 @@ public abstract class ViewRecipesScenario extends ConsoleScenario {
         return true;
     }
 
-    /**
-     * Can be overridden to extend functionality
-     */
-    ConsoleScenario selectOption() {
+    final ConsoleScenario selectOption() {
         interactor.printSeparator();
         while (true) {
             interactor.print("1. View recipe");
+            printMoreOptions();
             interactor.print("Q. Back");
 
-            switch (interactor.getString()) {
+            String selection = interactor.getString();
+            switch (selection) {
                 case "1":
                     Integer recipeId = numberReader.readInteger("Enter only recipe id");
                     if (getSelectables().stream().noneMatch(s -> s.getId().equals(recipeId))) {
                         interactor.printError("Recipe does not exist");
                         break;
                     }
-
                     return applicationContext.getBean(ViewRecipeScenario.class, MapBuilder.ofPair("recipeId", recipeId));
                 case "Q": case "q":
                     return applicationContext.getBean(BackScenario.class);
                 default:
-                    printHelp();
+                    handleSelection(selection);
             }
         }
     }

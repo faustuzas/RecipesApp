@@ -35,10 +35,10 @@ public class ConsoleApplication implements Bootable {
     }
 
     private void printTitle() {
-        interactor.printWithBorderAndColor("WELCOME TO FAUSTAS' RECIPES");
+        interactor.printHeader("WELCOME TO FAUSTAS' RECIPES");
     }
 
     private void printGoodbye() {
-        interactor.printWithBorderAndColor("GOOD BYE");
+        interactor.printHeader("GOOD BYE");
     }
 }

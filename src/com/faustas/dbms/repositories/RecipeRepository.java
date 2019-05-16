@@ -21,8 +21,18 @@ public interface RecipeRepository {
     })
     Recipe findById(@Param("id") Integer id);
 
+    @Select(value = "SELECT * FROM top_recipes_with_authors", resultClass = TopRecipe.class)
+    @Results({
+            @Result(column = "name", property = "authorName"),
+            @Result(column = "recipe_id", property = "id")
+    })
+    List<TopRecipe> findTop();
+
     @Select("SELECT * FROM recipes WHERE title ILIKE '%#title%'")
     List<Recipe> searchByName(@Param("title") String title);
+
+    @Select(value = "SELECT * FROM recipes WHERE author_id = #u.id")
+    List<Recipe> findByUser(@Param("u") User user);
 
     @Insert("INSERT INTO recipes (title, description, minutes_to_prepare, author_id) " +
             "VALUES (#r.title, #r.description, #r.minutesToPrepare, #u.id)")
@@ -38,12 +48,5 @@ public interface RecipeRepository {
     void delete(@Param("r") Recipe recipe);
 
     @Delete("DELETE FROM recipes WHERE id IN (@ids)")
-    void delete(@Param("ids") Integer[] ids);
-
-    @Select(value = "SELECT * FROM top_recipes_with_authors", resultClass = TopRecipe.class)
-    @Results({
-            @Result(column = "name", property = "authorName"),
-            @Result(column = "recipe_id", property = "id")
-    })
-    List<TopRecipe> findTop();
+    void delete(@Param("ids") List<Integer> ids);
 }

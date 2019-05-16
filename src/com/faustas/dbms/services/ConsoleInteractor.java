@@ -11,6 +11,7 @@ public class ConsoleInteractor {
     private static final ConsoleColor DEFAULT_COLOR = ConsoleColor.CYAN;
     private static final ConsoleColor HEADER_COLOR = ConsoleColor.YELLOW;
     private static final ConsoleColor SUCCESS_COLOR = ConsoleColor.GREEN;
+    private static final ConsoleColor HELP_COLOR = ConsoleColor.CYAN;
     private static final ConsoleColor SECTION_HEADER_COLOR = ConsoleColor.CYAN;
     private static final ConsoleColor ERROR_COLOR = ConsoleColor.RED;
     private static final int BORDER_LENGTH = 50;
@@ -62,10 +63,13 @@ public class ConsoleInteractor {
     }
 
     public void printWithBorderAndColor(String message, ConsoleColor color) {
-
         print(getMultipleSymbol('*', BORDER_LENGTH));
         printWithColor(centerMessage(message), color);
         print(getMultipleSymbol('*', BORDER_LENGTH));
+    }
+
+    public void printHelp(String message) {
+        printWithColor(message, HELP_COLOR);
     }
 
     public void printError(String error) {

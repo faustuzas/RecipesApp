@@ -1,6 +1,5 @@
 package com.faustas.dbms.framework;
 
-import com.faustas.dbms.Main;
 import com.faustas.dbms.framework.annotations.Repository;
 import com.faustas.dbms.framework.annotations.Service;
 import com.faustas.dbms.framework.annotations.Value;
@@ -93,6 +92,7 @@ public class ApplicationContext {
 
             return (T) createdService;
         } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
             throw new RuntimeException("Unable to instantiate wanted service: " + classType.getName());
         }
     }

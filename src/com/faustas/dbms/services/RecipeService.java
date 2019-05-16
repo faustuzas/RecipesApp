@@ -30,6 +30,10 @@ public class RecipeService {
         return recipeRepository.findById(id);
     }
 
+    public List<Recipe> findByUser(User user) {
+        return recipeRepository.findByUser(user);
+    }
+
     public List<TopRecipe> findTop() {
         return recipeRepository.findTop();
     }
@@ -41,5 +45,9 @@ public class RecipeService {
         for (Ingredient ingredient : recipe.getIngredients()) {
             ingredientRepository.insertForRecipe(ingredient, recipe);
         }
+    }
+
+    public void delete(List<Integer> recipesIds) {
+        recipeRepository.delete(recipesIds);
     }
 }

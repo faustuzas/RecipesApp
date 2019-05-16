@@ -9,6 +9,7 @@ import com.faustas.dbms.services.RecipeService;
 import com.faustas.dbms.utils.NumberReader;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Service(singleton = false)
 public class ViewTopRecipesScenario extends ViewRecipesScenario {
@@ -38,10 +39,10 @@ public class ViewTopRecipesScenario extends ViewRecipesScenario {
             return;
         }
 
-        for (int i = 0; i < topRecipes.size(); ++i) {
-            TopRecipe topRecipe = topRecipes.get(i);
-            interactor.print(String.format("#%d ID-%d \"%s\" (%.2f/5) by %s", i + 1, topRecipe.getId(), topRecipe.getTitle(),
-                    topRecipe.getAverageStars(), topRecipe.getAuthorName()));
-        }
+        IntStream.range(0, topRecipes.size()).forEach(i ->{
+            TopRecipe recipe = topRecipes.get(i);
+            interactor.print(String.format("%d. #%d \"%s\" (%.2f/5) by %s", i + 1, recipe.getId(), recipe.getTitle(),
+                    recipe.getAverageStars(), recipe.getAuthorName()));
+        });
     }
 }
