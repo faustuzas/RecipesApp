@@ -6,6 +6,7 @@ import com.faustas.dbms.framework.connections.DatabaseConnectionPool;
 
 import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Service
@@ -16,10 +17,16 @@ public class InsertQueryExecutor extends QueryExecutor {
     }
 
     @Override
-    Object execute(Method method, Object[] args) throws SQLException {
+    public Object execute(Method method, Object[] args) throws SQLException {
         Insert insertAnnotation = method.getAnnotation(Insert.class);
 
-        return executeQuery(insertAnnotation.value(), constructNamedArgs(method, args));
+        QueryResult queryResult = executeQuery(insertAnnotation.value(), constructNamedArgs(method, args));
+        ResultSet generatedKeys = queryResult.getStatement().getGeneratedKeys();
+        if (generatedKeys.next()) {
+            return generatedKeys.getInt("id");
+        }
+
+        return null;
     }
 
     @Override

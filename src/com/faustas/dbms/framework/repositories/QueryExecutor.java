@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,25 +16,34 @@ public abstract class QueryExecutor {
 
     protected final DatabaseConnectionPool connectionPool;
 
-    public QueryExecutor(DatabaseConnectionPool connectionPool) {
+    QueryExecutor(DatabaseConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
 
-    abstract Object execute(Method method, Object[] args) throws IOException, SQLException, ReflectiveOperationException;
+    /**
+     * Main method for external call
+     */
+    public abstract Object execute(Method method, Object[] args) throws IOException, SQLException, ReflectiveOperationException;
 
+    /**
+     * Choose correct way to execute statement
+     */
     abstract Object executeStatement(PreparedStatement statement) throws SQLException;
 
-    Object executeQuery(String query, Map<String, Object> namedArgs) throws SQLException {
+    /**
+     * Parse query, put arguments in it and execute it
+     */
+    QueryResult executeQuery(String query, Map<String, Object> namedArgs) throws SQLException {
         QueryProcessor queryProcessor = new QueryProcessor();
         ProcessedQuery processedQuery = queryProcessor.process(query, namedArgs);
 
         Connection connection = connectionPool.getConnection();
-        PreparedStatement statement = connection.prepareStatement(processedQuery.getPreparedQuery());
+        PreparedStatement statement = connection.prepareStatement(processedQuery.getPreparedQuery(), Statement.RETURN_GENERATED_KEYS);
         prepareStatement(statement, processedQuery.getPositionalParams());
         Object result = executeStatement(statement);
         connectionPool.releaseConnection(connection);
 
-        return result;
+        return new QueryResult(statement, result);
     }
 
     Map<String, Object> constructNamedArgs(Method method, Object[] args) {

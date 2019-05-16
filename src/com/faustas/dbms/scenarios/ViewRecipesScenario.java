@@ -52,17 +52,13 @@ public abstract class ViewRecipesScenario extends ConsoleScenario {
 
             switch (interactor.getString()) {
                 case "1":
-                    try {
-                        // Check if given id is in the list
-                        Integer recipeId = numberReader.readInteger("Enter only recipe id");
-                        getSelectables().stream().filter(s -> s.getId().equals(recipeId)).findFirst()
-                                .orElseThrow(IllegalArgumentException::new);
-
-                        return applicationContext.getBean(ViewRecipeScenario.class, MapBuilder.ofPair("recipeId", recipeId));
-                    } catch (IllegalArgumentException e) {
+                    Integer recipeId = numberReader.readInteger("Enter only recipe id");
+                    if (getSelectables().stream().noneMatch(s -> s.getId().equals(recipeId))) {
                         interactor.printError("Recipe does not exist");
                         break;
                     }
+
+                    return applicationContext.getBean(ViewRecipeScenario.class, MapBuilder.ofPair("recipeId", recipeId));
                 case "Q": case "q":
                     return applicationContext.getBean(BackScenario.class);
                 default:

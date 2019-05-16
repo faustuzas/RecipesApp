@@ -26,7 +26,7 @@ public interface RecipeRepository {
 
     @Insert("INSERT INTO recipes (title, description, minutes_to_prepare, author_id) " +
             "VALUES (#r.title, #r.description, #r.minutesToPrepare, #u.id)")
-    void insertForUser(@Param("r") Recipe recipe, @Param("u") User user);
+    Integer insertForUser(@Param("r") Recipe recipe, @Param("u") User user);
 
     @Update("UPDATE recipes " +
             "SET title = #r.title, description = #r.description, " +

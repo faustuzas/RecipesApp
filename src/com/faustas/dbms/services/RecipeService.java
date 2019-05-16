@@ -1,8 +1,11 @@
 package com.faustas.dbms.services;
 
 import com.faustas.dbms.framework.annotations.Service;
+import com.faustas.dbms.models.Ingredient;
 import com.faustas.dbms.models.Recipe;
 import com.faustas.dbms.models.TopRecipe;
+import com.faustas.dbms.models.User;
+import com.faustas.dbms.repositories.IngredientRepository;
 import com.faustas.dbms.repositories.RecipeRepository;
 
 import java.util.List;
@@ -12,8 +15,11 @@ public class RecipeService {
 
     private RecipeRepository recipeRepository;
 
-    public RecipeService(RecipeRepository recipeRepository) {
+    private IngredientRepository ingredientRepository;
+
+    public RecipeService(RecipeRepository recipeRepository, IngredientRepository ingredientRepository) {
         this.recipeRepository = recipeRepository;
+        this.ingredientRepository = ingredientRepository;
     }
 
     public List<Recipe> findAll() {
@@ -26,5 +32,14 @@ public class RecipeService {
 
     public List<TopRecipe> findTop() {
         return recipeRepository.findTop();
+    }
+
+    public void insertForUser(Recipe recipe, User user) {
+        Integer recipeId = recipeRepository.insertForUser(recipe, user);
+        recipe.setId(recipeId);
+
+        for (Ingredient ingredient : recipe.getIngredients()) {
+            ingredientRepository.insertForRecipe(ingredient, recipe);
+        }
     }
 }

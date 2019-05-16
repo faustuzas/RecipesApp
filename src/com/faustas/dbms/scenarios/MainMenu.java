@@ -53,7 +53,7 @@ public class MainMenu implements ScenarioProvider {
                 case "2":
                     return applicationContext.getBean(ViewAllRecipesScenario.class);
                 case "3":
-                    return null;
+                    return applicationContext.getBean(AddRecipeScenario.class);
                 case "4":
                     return applicationContext.getBean(AddProductScenario.class);
                 case "5":

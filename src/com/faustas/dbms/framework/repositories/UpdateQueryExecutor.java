@@ -16,7 +16,7 @@ public class UpdateQueryExecutor extends QueryExecutor {
     }
 
     @Override
-    Object execute(Method method, Object[] args) throws SQLException {
+    public Object execute(Method method, Object[] args) throws SQLException {
         Update updateAnnotation = method.getAnnotation(Update.class);
 
         return executeQuery(updateAnnotation.value(), constructNamedArgs(method, args));

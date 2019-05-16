@@ -21,7 +21,8 @@ public class SelectQueryExecutor extends QueryExecutor {
     public Object execute(Method method, Object[] args) throws SQLException, ReflectiveOperationException {
         Select selectAnnotation = method.getAnnotation(Select.class);
 
-        ResultSet resultSet = (ResultSet) executeQuery(selectAnnotation.value(), constructNamedArgs(method, args));
+        QueryResult queryResult = executeQuery(selectAnnotation.value(), constructNamedArgs(method, args));
+        ResultSet resultSet = (ResultSet) queryResult.getResult();
 
         Class<?> returnClass = method.getDeclaringClass().getAnnotation(Repository.class).value();
         if (!selectAnnotation.resultClass().equals(void.class)) {

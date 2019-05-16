@@ -16,7 +16,7 @@ public class DeleteQueryExecutor extends QueryExecutor {
     }
 
     @Override
-    Object execute(Method method, Object[] args) throws SQLException {
+    public Object execute(Method method, Object[] args) throws SQLException {
         Delete deleteAnnotation = method.getAnnotation(Delete.class);
 
         return executeQuery(deleteAnnotation.value(), constructNamedArgs(method, args));

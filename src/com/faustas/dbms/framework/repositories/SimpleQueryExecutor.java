@@ -20,7 +20,7 @@ public class SimpleQueryExecutor extends QueryExecutor {
     }
 
     @Override
-    Object execute(Method method, Object[] args) throws SQLException {
+    public Object execute(Method method, Object[] args) throws SQLException {
         Sql sqlAnnotation = method.getAnnotation(Sql.class);
 
         return executeQuery(sqlAnnotation.value(), constructNamedArgs(method, args));

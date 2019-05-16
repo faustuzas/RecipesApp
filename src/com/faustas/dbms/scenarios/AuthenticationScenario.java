@@ -40,8 +40,12 @@ public class AuthenticationScenario extends ConsoleScenario {
                 }
                 case "2": {
                     UserRegistrationInfo.Builder builder = new UserRegistrationInfo.Builder();
-                    builder.name(interactor.getString("Your name > "));
-                    builder.email(interactor.getString("Your email > "));
+
+                    String name = interactor.getString("Your name > ");
+                    builder.name(name);
+
+                    String email = interactor.getString("Your email > ");
+                    builder.email(email);
 
                     while (true) {
                         interactor.print("Enter your password");

@@ -13,7 +13,7 @@ public class QueryProcessor {
 
     private static final String LIST_GLUE = ", ";
 
-    private static final Pattern PARAM_PATTERN = Pattern.compile("([@#]\\w+[\\w.]+)");
+    private static final Pattern PARAM_PATTERN = Pattern.compile("([@#]%?\\w+[\\w.]+%?)");
 
     public ProcessedQuery process(String unprepared, Map<String, Object> namedArgs) {
         Map<Integer, Object> positionalParameters = new HashMap<>();
@@ -60,22 +60,43 @@ public class QueryProcessor {
     }
 
     private Object extractValue(String name, Map<String, Object> namedArgs) {
+        String prefix = "";
+        String postfix = "";
+
+        if (name.startsWith("%")) {
+            prefix = "%";
+            name = name.substring(1);
+        }
+
+        if (name.endsWith("%")) {
+            postfix = "%";
+            name = name.substring(0, name.length() - 1);
+        }
+
         if (!name.contains(".")) {
-            return namedArgs.get(name);
+            return wrap(namedArgs.get(name), prefix, postfix);
         }
 
         String[] valuePath = name.split("\\.");
-        Object target = namedArgs.get(valuePath[0]); // root object
+        Object result = namedArgs.get(valuePath[0]); // root object
         try {
             for (int i = 1; i < valuePath.length; ++i) {
-                Method getter = target.getClass().getMethod(formatFieldToGetter(valuePath[i]));
-                target = getter.invoke(target);
+                Method getter = result.getClass().getMethod(formatFieldToGetter(valuePath[i]));
+                result = getter.invoke(result);
             }
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("When providing nested objects make sure there are correct getters");
         }
 
-        return target;
+        return wrap(result, prefix, postfix);
+    }
+
+    private Object wrap(Object result, String prefix, String postfix) {
+        if (result instanceof String) {
+            result = prefix + result + postfix;
+        }
+
+        return result;
     }
 
     private String formatFieldToGetter(String field) {
