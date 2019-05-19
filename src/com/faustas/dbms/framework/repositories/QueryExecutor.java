@@ -1,7 +1,6 @@
 package com.faustas.dbms.framework.repositories;
 
 import com.faustas.dbms.framework.annotations.Param;
-import com.faustas.dbms.framework.connections.DatabaseConnectionPool;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -14,16 +13,10 @@ import java.util.stream.Collectors;
 
 public abstract class QueryExecutor {
 
-    protected final DatabaseConnectionPool connectionPool;
-
-    QueryExecutor(DatabaseConnectionPool connectionPool) {
-        this.connectionPool = connectionPool;
-    }
-
     /**
      * Main method for external call
      */
-    public abstract Object execute(Method method, Object[] args) throws IOException, SQLException, ReflectiveOperationException;
+    public abstract Object execute(Connection connection, Method method, Object[] args) throws IOException, SQLException, ReflectiveOperationException;
 
     /**
      * Choose correct way to execute statement
@@ -33,15 +26,13 @@ public abstract class QueryExecutor {
     /**
      * Parse query, put arguments in it and execute it
      */
-    QueryResult executeQuery(String query, Map<String, Object> namedArgs) throws SQLException {
+    QueryResult executeQuery(Connection connection, String query, Map<String, Object> namedArgs) throws SQLException {
         QueryProcessor queryProcessor = new QueryProcessor();
         ProcessedQuery processedQuery = queryProcessor.process(query, namedArgs);
 
-        Connection connection = connectionPool.getConnection();
         PreparedStatement statement = connection.prepareStatement(processedQuery.getPreparedQuery(), Statement.RETURN_GENERATED_KEYS);
         prepareStatement(statement, processedQuery.getPositionalParams());
         Object result = executeStatement(statement);
-        connectionPool.releaseConnection(connection);
 
         return new QueryResult(statement, result);
     }

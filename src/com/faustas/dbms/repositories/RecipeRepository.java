@@ -1,6 +1,7 @@
 package com.faustas.dbms.repositories;
 
 import com.faustas.dbms.framework.annotations.*;
+import com.faustas.dbms.framework.repositories.Transactional;
 import com.faustas.dbms.models.Recipe;
 import com.faustas.dbms.models.TopRecipe;
 import com.faustas.dbms.models.User;
@@ -8,7 +9,7 @@ import com.faustas.dbms.models.User;
 import java.util.List;
 
 @Repository(Recipe.class)
-public interface RecipeRepository {
+public interface RecipeRepository extends Transactional {
 
     @Select("SELECT * FROM recipes")
     List<Recipe> findAll();

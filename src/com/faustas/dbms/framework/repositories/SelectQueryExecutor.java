@@ -1,7 +1,6 @@
 package com.faustas.dbms.framework.repositories;
 
 import com.faustas.dbms.framework.annotations.*;
-import com.faustas.dbms.framework.connections.DatabaseConnectionPool;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -13,15 +12,11 @@ import java.util.stream.Collectors;
 @Service
 public class SelectQueryExecutor extends QueryExecutor {
 
-    public SelectQueryExecutor(DatabaseConnectionPool connectionPool) {
-        super(connectionPool);
-    }
-
     @Override
-    public Object execute(Method method, Object[] args) throws SQLException, ReflectiveOperationException {
+    public Object execute(Connection connection, Method method, Object[] args) throws SQLException, ReflectiveOperationException {
         Select selectAnnotation = method.getAnnotation(Select.class);
 
-        QueryResult queryResult = executeQuery(selectAnnotation.value(), constructNamedArgs(method, args));
+        QueryResult queryResult = executeQuery(connection, selectAnnotation.value(), constructNamedArgs(method, args));
         ResultSet resultSet = (ResultSet) queryResult.getResult();
 
         Class<?> returnClass = method.getDeclaringClass().getAnnotation(Repository.class).value();
@@ -77,7 +72,7 @@ public class SelectQueryExecutor extends QueryExecutor {
                              * Execute recursively this method if there is indicated method from another
                              * class to get all object relational tree
                              */
-                            setter.invoke(returnObject, execute(externalMethod, new Object[] { arg }));
+                            setter.invoke(returnObject, execute(connection, externalMethod, new Object[] { arg }));
                         } else {
                             /*
                              * Just assign value from column with different name than property

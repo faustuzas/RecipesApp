@@ -39,11 +39,18 @@ public class RecipeService {
     }
 
     public void insertForUser(Recipe recipe, User user) {
-        Integer recipeId = recipeRepository.insertForUser(recipe, user);
-        recipe.setId(recipeId);
+        recipeRepository.startTransaction();
+        try {
+            Integer recipeId = recipeRepository.insertForUser(recipe, user);
+            recipe.setId(recipeId);
 
-        for (Ingredient ingredient : recipe.getIngredients()) {
-            ingredientRepository.insertForRecipe(ingredient, recipe);
+            for (Ingredient ingredient : recipe.getIngredients()) {
+                ingredientRepository.insertForRecipe(ingredient, recipe);
+            }
+            recipeRepository.commit();
+        } catch (Exception e) {
+            recipeRepository.rollback();
+            throw new RuntimeException(e.getMessage());
         }
     }
 
