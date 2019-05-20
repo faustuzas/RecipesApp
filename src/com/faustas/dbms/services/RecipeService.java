@@ -9,6 +9,7 @@ import com.faustas.dbms.repositories.IngredientRepository;
 import com.faustas.dbms.repositories.RecipeRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RecipeService {
@@ -51,6 +52,35 @@ public class RecipeService {
         } catch (Exception e) {
             recipeRepository.rollback();
             throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public void update(Recipe originalRecipe, Recipe newRecipe) {
+        recipeRepository.startTransaction();
+
+        try {
+            // save newly added recipes
+            newRecipe.getIngredients().stream()
+                    .filter(i -> i.getId() == null)
+                    .forEach(i -> ingredientRepository.insertForRecipe(i, originalRecipe));
+
+            // delete removed recipes
+            List<Integer> leftIngredientsIds = newRecipe.getIngredients().stream()
+                    .filter(i -> i.getId() != null)
+                    .map(Ingredient::getId)
+                    .collect(Collectors.toList());
+
+            originalRecipe.getIngredients().stream().filter(i -> !leftIngredientsIds.contains(i.getId()))
+                    .forEach(ingredientRepository::delete);
+ 
+
+            newRecipe.setId(originalRecipe.getId());
+            recipeRepository.update(newRecipe);
+
+            recipeRepository.commit();
+        } catch (Exception e) {
+            recipeRepository.rollback();
+            throw new RuntimeException(e);
         }
     }
 
