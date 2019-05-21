@@ -34,5 +34,5 @@ if [[ -d "${DIST_DIR}" ]]; then
 fi
 mkdir ${DIST_DIR}
 
-cp ${BUILD_DIR}/${JAR_NAME} ${DIST_DIR}/ > /dev/null
-cp ${LIBS_DIR} ${DIST_DIR} > /dev/null
+cp ${BUILD_DIR}/${JAR_NAME} ${DIST_DIR}/
+cp ${LIBS_DIR}/* ${DIST_DIR}
