@@ -4,7 +4,7 @@ SET SOURCES_FILE=sources.txt
 SET BUILD_DIR=build
 SET DIST_DIR=dist
 SET LIBS_DIR=libs
-SET JAR_NAME=stiklainis.jar
+SET JAR_NAME=recipe-app.jar
 
 dir /s /B *.java > %SOURCES_FILE%
 IF EXIST %BUILD_DIR% rmdir /s /q %BUILD_DIR%
