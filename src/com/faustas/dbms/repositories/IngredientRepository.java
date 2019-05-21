@@ -29,7 +29,7 @@ public interface IngredientRepository {
 
     @Insert("INSERT INTO ingredients (amount, product_id, recipe_id) " +
             "VALUES (#i.amount, #i.product.id, #r.id)")
-    void insertForRecipe(@Param("i") Ingredient ingredient, @Param("r") Recipe recipe);
+    Integer insertForRecipe(@Param("i") Ingredient ingredient, @Param("r") Recipe recipe);
 
     @Update("UPDATE ingredients " +
             "SET amount = #i.amount, product_id = #i.product.id " +

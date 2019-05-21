@@ -12,9 +12,11 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ApplicationContext {
 
@@ -181,13 +183,40 @@ public class ApplicationContext {
     }
 
     private void loadProperties(String pathToProperties) throws IOException {
-        for (String line : Files.readAllLines(Paths.get(pathToProperties))) {
+        // try to find file in file system with provided path
+        File file = new File(pathToProperties);
+        if (file.exists()) {
+            List<String> properties = Files.readAllLines(Paths.get(pathToProperties));
+            parseProperties(properties);
+            return;
+        }
+
+        // check if properties file exists in class path
+        String classPathPropertiesFile = pathToProperties;
+        if (!classPathPropertiesFile.startsWith("/")) {
+            classPathPropertiesFile = "/" + classPathPropertiesFile;
+        }
+
+        if (getClass().getResource(classPathPropertiesFile) != null) {
+            InputStream propertiesStream = getClass().getResourceAsStream(classPathPropertiesFile);
+            List<String> properties = new BufferedReader(new InputStreamReader(propertiesStream, StandardCharsets.UTF_8))
+                    .lines().collect(Collectors.toList());
+
+            parseProperties(properties);
+            return;
+        }
+
+        throw new IOException("Provided properties path does not exist");
+    }
+
+    private void parseProperties(List<String> properties) {
+        for (String line : properties) {
             String[] keyValuePair = line.split(" *= *");
             if (keyValuePair.length != 2) {
                 throw new RuntimeException("Properties file has bad format. Make sure its \"key=exec\" and one per line");
             }
 
-            properties.put(keyValuePair[0], keyValuePair[1]);
+            this.properties.put(keyValuePair[0], keyValuePair[1]);
         }
     }
 

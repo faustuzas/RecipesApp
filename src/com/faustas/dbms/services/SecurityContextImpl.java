@@ -7,20 +7,20 @@ import com.faustas.dbms.models.User;
 @Service
 public class SecurityContextImpl implements SecurityContext {
 
-    private User user;
+    private ThreadLocal<User> userHolder = ThreadLocal.withInitial(() -> null);
 
     @Override
     public synchronized User getAuthenticatedUser() {
-        return user;
+        return userHolder.get();
     }
 
     @Override
     public synchronized void setAuthenticatedUser(User user) {
-        this.user = user;
+        this.userHolder.set(user);
     }
 
     @Override
     public void clear() {
-        this.user = null;
+        this.userHolder.remove();
     }
 }

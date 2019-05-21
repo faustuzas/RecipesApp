@@ -12,20 +12,20 @@ public class NumberReader {
         this.interactor = interactor;
     }
 
-    public Integer readInteger(String errorMessage) {
+    public Integer readInteger(String message, String errorMessage) {
         while (true) {
             try {
-                return Integer.valueOf(interactor.getString());
+                return Integer.valueOf(interactor.getString(message));
             } catch (NumberFormatException e) {
                 interactor.printError(errorMessage);
             }
         }
     }
 
-    public Double readDouble(String errorMessage) {
+    public Double readDouble(String message, String errorMessage) {
         while (true) {
             try {
-                return Double.valueOf(interactor.getString());
+                return Double.valueOf(interactor.getString(message));
             } catch (NumberFormatException e) {
                 interactor.printError(errorMessage);
             }

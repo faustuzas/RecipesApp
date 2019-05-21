@@ -1,7 +1,7 @@
 package com.faustas.dbms.repositories;
 
 import com.faustas.dbms.framework.annotations.*;
-import com.faustas.dbms.framework.repositories.Transactional;
+import com.faustas.dbms.framework.interfaces.Transactional;
 import com.faustas.dbms.models.Recipe;
 import com.faustas.dbms.models.TopRecipe;
 import com.faustas.dbms.models.User;
@@ -43,7 +43,7 @@ public interface RecipeRepository extends Transactional {
             "SET title = #r.title, description = #r.description, " +
             "minutes_to_prepare = #r.minutesToPrepare " +
             "WHERE id = #r.id")
-    Integer update(@Param("r") Recipe recipe);
+    void update(@Param("r") Recipe recipe);
 
     @Delete("DELETE FROM recipes WHERE id = #r.id")
     void delete(@Param("r") Recipe recipe);

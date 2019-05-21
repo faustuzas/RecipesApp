@@ -1,4 +1,4 @@
-package com.faustas.dbms.framework.repositories;
+package com.faustas.dbms.framework.interfaces;
 
 public interface Transactional {
 

@@ -7,21 +7,25 @@ import com.faustas.dbms.models.Ingredient;
 import com.faustas.dbms.models.Recipe;
 import com.faustas.dbms.models.Review;
 import com.faustas.dbms.services.ConsoleInteractor;
+import com.faustas.dbms.services.ProductService;
 import com.faustas.dbms.services.RecipeService;
+import com.faustas.dbms.utils.ConsoleColor;
 import com.faustas.dbms.utils.MapBuilder;
+import com.faustas.dbms.utils.NumberReader;
 
 import java.util.List;
 
 @Service(singleton = false)
-public class ViewRecipeScenario extends ConsoleScenario {
-
-    private Recipe recipe;
+public class ViewRecipeScenario extends RecipeCRUDScenario {
 
     private ApplicationContext applicationContext;
 
-    public ViewRecipeScenario(ConsoleInteractor interactor, ApplicationContext applicationContext,
-                              RecipeService recipeService, @Value("recipeId") Integer recipeId) {
-        super(interactor);
+    private Recipe recipe;
+
+    public ViewRecipeScenario(ConsoleInteractor interactor, ProductService productService,
+                              NumberReader numberReader, RecipeService recipeService,
+                              ApplicationContext applicationContext, @Value("recipeId") Integer recipeId) {
+        super(interactor, productService, numberReader, recipeService);
         this.recipe = recipeService.findById(recipeId);
         this.applicationContext = applicationContext;
     }
@@ -29,11 +33,7 @@ public class ViewRecipeScenario extends ConsoleScenario {
     @Override
     public boolean action() {
         interactor.printHeader(recipe.getTitle());
-        interactor.print(recipe.getDescription());
-        interactor.printSectionHeader("Ingredients:");
-        for (Ingredient ingredient : recipe.getIngredients()) {
-            interactor.print(String.format("* %s (%s)", ingredient.getProduct().getName(), ingredient.getAmount()));
-        }
+        printRecipeInfo(recipe);
 
         List<Review> reviews = recipe.getReviews();
         if (reviews.size() > 0) {
@@ -54,7 +54,7 @@ public class ViewRecipeScenario extends ConsoleScenario {
                     return applicationContext.getBean(WriteReviewScenario.class, MapBuilder.ofPair("recipe", recipe))
                             .action();
                 case "Q": case "q":
-                    return applicationContext.getBean(BackScenario.class).action();
+                    return true;
                 default:
                     printHelp();
             }

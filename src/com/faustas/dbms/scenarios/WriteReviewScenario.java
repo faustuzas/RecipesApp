@@ -36,7 +36,7 @@ public class WriteReviewScenario extends ConsoleScenario {
 
         String comment = interactor.ask("Enter your opinion:");
         interactor.print("Stars (0-5):");
-        Integer stars = numberReader.readInteger("Please enter natural number from 0 to 5");
+        Integer stars = numberReader.readInteger("Stars > ", "Please enter natural number from 0 to 5");
 
         Review review = new Review();
         review.setComment(comment);

@@ -11,13 +11,13 @@ import java.util.List;
 
 public abstract class ViewRecipesScenario extends ConsoleScenario {
 
-    static final Integer EXTEND_FROM_OPTION = 2;
+    static final int EXTEND_FROM_OPTION = 2;
 
     RecipeService recipeService;
 
     ApplicationContext applicationContext;
 
-    private NumberReader numberReader;
+    NumberReader numberReader;
 
     public ViewRecipesScenario(ConsoleInteractor interactor, ApplicationContext applicationContext,
                                RecipeService recipeService, NumberReader numberReader) {
@@ -36,7 +36,8 @@ public abstract class ViewRecipesScenario extends ConsoleScenario {
     /**
      * Can be overridden to extend functionality
      */
-    void printMoreOptions() { }
+    void printMoreOptions() {
+    }
 
     /**
      * Can be overridden to extend functionality
@@ -47,17 +48,11 @@ public abstract class ViewRecipesScenario extends ConsoleScenario {
 
     @Override
     public boolean action() {
-        do {
+        while (true) {
             interactor.printHeader(getTitle());
             printRecipes();
-        } while (selectOption().action());
 
-        return true;
-    }
-
-    final ConsoleScenario selectOption() {
-        interactor.printSeparator();
-        while (true) {
+            interactor.printSeparator();
             interactor.print("1. View recipe");
             printMoreOptions();
             interactor.print("Q. Back");
@@ -65,14 +60,16 @@ public abstract class ViewRecipesScenario extends ConsoleScenario {
             String selection = interactor.getString();
             switch (selection) {
                 case "1":
-                    Integer recipeId = numberReader.readInteger("Enter only recipe id");
+                    Integer recipeId = numberReader.readInteger("Recipe id > ", "Enter only id");
                     if (getSelectables().stream().noneMatch(s -> s.getId().equals(recipeId))) {
                         interactor.printError("Recipe does not exist");
                         break;
                     }
-                    return applicationContext.getBean(ViewRecipeScenario.class, MapBuilder.ofPair("recipeId", recipeId));
+                    applicationContext.getBean(ViewRecipeScenario.class, MapBuilder.ofPair("recipeId", recipeId))
+                            .action();
+                    break;
                 case "Q": case "q":
-                    return applicationContext.getBean(BackScenario.class);
+                    return true;
                 default:
                     handleSelection(selection);
             }

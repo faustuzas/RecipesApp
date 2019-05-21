@@ -19,7 +19,7 @@ public class ViewAllRecipesScenario extends ViewRecipesScenario {
     public ViewAllRecipesScenario(ConsoleInteractor interactor, ApplicationContext applicationContext,
                                   RecipeService recipeService, NumberReader numberReader) {
         super(interactor, applicationContext, recipeService, numberReader);
-        recipes = recipeService.findAll();
+        this.recipes = recipeService.findAll();
     }
 
     @Override

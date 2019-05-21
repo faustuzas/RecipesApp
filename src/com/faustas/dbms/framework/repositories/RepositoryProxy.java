@@ -19,7 +19,7 @@ public class RepositoryProxy implements InvocationHandler {
     private DeleteQueryExecutor deleteExecutor;
     private SimpleQueryExecutor simpleExecutor;
     
-    private ThreadLocal<Connection> connectionHolder = new ThreadLocal<>();
+    private ThreadLocal<Connection> connectionHolder = ThreadLocal.withInitial(() -> null);
 
     public RepositoryProxy(DatabaseConnectionPool connectionPool, SelectQueryExecutor selectExecutor, 
                            UpdateQueryExecutor updateExecutor, InsertQueryExecutor insertExecutor, 

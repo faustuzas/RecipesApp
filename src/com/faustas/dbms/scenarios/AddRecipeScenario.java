@@ -3,7 +3,6 @@ package com.faustas.dbms.scenarios;
 import com.faustas.dbms.framework.annotations.Service;
 import com.faustas.dbms.interfaces.SecurityContext;
 import com.faustas.dbms.models.Ingredient;
-import com.faustas.dbms.models.Product;
 import com.faustas.dbms.models.Recipe;
 import com.faustas.dbms.services.ConsoleInteractor;
 import com.faustas.dbms.services.ProductService;
@@ -14,23 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class AddRecipeScenario extends ConsoleScenario {
-
-    private RecipeService recipeService;
-
-    private NumberReader numberReader;
-
-    private ProductService productService;
+public class AddRecipeScenario extends RecipeCRUDScenario {
 
     private SecurityContext securityContext;
 
-    public AddRecipeScenario(ConsoleInteractor interactor, RecipeService recipeService,
-                             NumberReader numberReader, ProductService productService,
+    public AddRecipeScenario(ConsoleInteractor interactor, ProductService productService,
+                             NumberReader numberReader, RecipeService recipeService,
                              SecurityContext securityContext) {
-        super(interactor);
-        this.recipeService = recipeService;
-        this.numberReader = numberReader;
-        this.productService = productService;
+        super(interactor, productService, numberReader, recipeService);
         this.securityContext = securityContext;
     }
 
@@ -49,7 +39,7 @@ public class AddRecipeScenario extends ConsoleScenario {
         recipe.setDescription(description);
 
         interactor.print("Minutes to prepare");
-        Integer minutesToPrepare = numberReader.readInteger("Please enter only number");
+        Integer minutesToPrepare = numberReader.readInteger("Minutes > ", "Enter only number of minutes");
         recipe.setMinutesToPrepare(minutesToPrepare);
 
         List<Ingredient> ingredients = new ArrayList<>();
@@ -86,64 +76,5 @@ public class AddRecipeScenario extends ConsoleScenario {
         }
 
         return true;
-    }
-
-    Ingredient createNewIngredient() {
-        while (true) {
-            interactor.printSeparator();
-            interactor.print("1. Search for product");
-            interactor.print("2. Cancel");
-
-            switch (interactor.getString()) {
-                case "1":
-                    String productName = interactor.ask("Enter product name: ");
-                    List<Product> foundProducts = productService.searchByName(productName);
-                    if (foundProducts.size() == 0) {
-                        interactor.print("No products found");
-                        break;
-                    }
-
-                    interactor.print(String.format("%d products found:", foundProducts.size()));
-                    for (Product product : foundProducts) {
-                        interactor.print(String.format(
-                                "* ID-%d %s", product.getId(), product.getName()));
-                    }
-
-                    interactor.print("1. Select");
-                    interactor.print("2. Cancel");
-                    selectProductLoop:
-                    while (true) {
-                        switch (interactor.getString()) {
-                            case "1":
-                                Product product = null;
-                                while (product == null) {
-                                    Integer productId = numberReader.readInteger("Enter only product id");
-                                    product = foundProducts.stream().filter(p -> p.getId().equals(productId))
-                                        .findFirst().orElseGet(() -> {
-                                            interactor.printError("Product with this id does not exist");
-                                            return null;
-                                        });
-                                }
-
-
-                                String amount = interactor.ask("Enter amount for " + product.getName());
-
-                                Ingredient ingredient = new Ingredient();
-                                ingredient.setAmount(amount);
-                                ingredient.setProduct(product);
-
-                                return ingredient;
-                            case "2":
-                                break selectProductLoop;
-                            default:
-                                printHelp();
-                        }
-                    }
-                case "2":
-                    return null;
-                default:
-                    printHelp();
-            }
-        }
     }
 }

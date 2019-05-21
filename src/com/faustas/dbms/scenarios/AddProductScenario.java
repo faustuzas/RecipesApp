@@ -30,15 +30,15 @@ public class AddProductScenario extends ConsoleScenario {
         product.setName(name);
 
         interactor.print("Carbohydrates per 100g:");
-        Double carbohydrates = numberReader.readDouble("Enter number from 0 to 100");
+        Double carbohydrates = numberReader.readDouble("Grams > ","Enter number from 0 to 100");
         product.setCarbohydrates(carbohydrates);
 
         interactor.print("Proteins per 100g:");
-        Double proteins = numberReader.readDouble("Enter number from 0 to 100");
+        Double proteins = numberReader.readDouble("Grams > ","Enter number from 0 to 100");
         product.setProteins(proteins);
 
         interactor.print("Fats per 100g:");
-        Double fats = numberReader.readDouble("Enter number from 0 to 100");
+        Double fats = numberReader.readDouble("Grams > ","Enter number from 0 to 100");
         product.setFats(fats);
 
         try {
