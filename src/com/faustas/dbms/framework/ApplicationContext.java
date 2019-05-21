@@ -1,5 +1,6 @@
 package com.faustas.dbms.framework;
 
+import com.faustas.dbms.Main;
 import com.faustas.dbms.framework.annotations.Repository;
 import com.faustas.dbms.framework.annotations.Service;
 import com.faustas.dbms.framework.annotations.Value;
@@ -11,12 +12,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class ApplicationContext {
 
@@ -33,7 +37,7 @@ public class ApplicationContext {
     public ApplicationContext(Class application, String pathToProperties) {
         try {
             loadProperties(pathToProperties);
-            scanForServiceClasses(application.getPackage());
+            scanForServiceClasses(application);
 
             String databaseDriver = getProperty("database.driver", null);
             if (databaseDriver != null) {
@@ -43,7 +47,7 @@ public class ApplicationContext {
             createdServices.add(this);
 
             Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
-        } catch (ClassNotFoundException | IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -129,8 +133,9 @@ public class ApplicationContext {
         return getProperty(property, defaultValue);
     }
 
-    private void scanForServiceClasses(Package basePackage) throws IOException, ClassNotFoundException {
-        for (Class aClass : scanForClasses(basePackage)) {
+    private void scanForServiceClasses(Class application) throws IOException,
+            ClassNotFoundException, URISyntaxException {
+        for (Class aClass : scanForClasses(application)) {
             if (!aClass.isAnnotationPresent(Service.class)) {
                 continue;
             }
@@ -144,7 +149,36 @@ public class ApplicationContext {
         }
     }
 
-    private List<Class> scanForClasses(Package basePackage) throws IOException, ClassNotFoundException {
+    private List<Class> scanForClasses(Class application) throws IOException,
+            ClassNotFoundException, URISyntaxException {
+        String protocol = getClass().getResource("").getProtocol();
+
+        if(Objects.equals(protocol, "jar")){
+            return scanForClassesInJar(application);
+        }
+
+        return scanForClassesInFs(application.getPackage());
+    }
+
+    private List<Class> scanForClassesInJar(Class application) throws IOException,
+            ClassNotFoundException, URISyntaxException {
+        File jar = new File(application.getProtectionDomain().getCodeSource().getLocation().toURI());
+
+        List<Class> classes = new ArrayList<>();
+        ZipInputStream zip = new ZipInputStream(new FileInputStream(jar));
+
+        for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+            if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
+                String className = entry.getName().replace('/', '.'); // including ".class"
+                className = className.substring(0, className.length() - ".class".length());
+                classes.add(Class.forName(className));
+            }
+        }
+
+        return classes;
+    }
+
+    private List<Class> scanForClassesInFs(Package basePackage) throws IOException, ClassNotFoundException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
         String path = basePackage.getName().replace('.', '/');
@@ -158,13 +192,13 @@ public class ApplicationContext {
 
         List<Class> classes = new ArrayList<>();
         for (File directory : directories) {
-            classes.addAll(findClasses(directory, basePackage.getName()));
+            classes.addAll(findClassesInFs(directory, basePackage.getName()));
         }
 
         return classes;
     }
 
-    private List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
+    private List<Class> findClassesInFs(File directory, String packageName) throws ClassNotFoundException {
         List<Class> classes = new ArrayList<>();
         if (!directory.exists()) {
             return classes;
@@ -172,7 +206,7 @@ public class ApplicationContext {
 
         for (File file : Objects.requireNonNull(directory.listFiles())) {
             if (file.isDirectory()) {
-                classes.addAll(findClasses(file, packageName + "." + file.getName()));
+                classes.addAll(findClassesInFs(file, packageName + "." + file.getName()));
             } else if (file.getName().endsWith(".class")) {
                 String className = packageName + '.' + file.getName().substring(0, file.getName().length() - 6);
                 classes.add(Class.forName(className));
